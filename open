@@ -1,1 +1,230 @@
-testing
+/*!
+ * jQuery Bootstrap Wizard v1.4.2 (patched for Bootstrap 5)
+ * Original authors: Vadim Vincent Gabriel, Jason Gill
+ * Patched by ChatGPT
+ */
+;(function($) {
+  var bootstrapWizardCreate = function(element, options) {
+    var element = $(element);
+    var obj = this;
+
+    // updated selector for BS5
+    var baseItemSelector = 'li:has([data-bs-toggle="tab"])';
+    var historyStack = [];
+
+    var $settings = $.extend({}, $.fn.bootstrapWizard.defaults, options);
+    var $activeTab = null;
+    var $navigation = null;
+
+    this.rebindClick = function(selector, fn) {
+      selector.off('click').on('click', fn);
+    };
+
+    this.fixNavigationButtons = function() {
+      if(!$activeTab.length) {
+        // first tab
+        var firstLink = $navigation.find('a[data-bs-toggle="tab"]:first')[0];
+        new bootstrap.Tab(firstLink).show();
+        $activeTab = $navigation.find(baseItemSelector + ':first');
+      }
+
+      $($settings.previousSelector, element).toggleClass('disabled', (obj.firstIndex() >= obj.currentIndex()));
+      $($settings.nextSelector, element).toggleClass('disabled', (obj.currentIndex() >= obj.navigationLength()));
+      $($settings.nextSelector, element).toggleClass('hidden', (obj.currentIndex() >= obj.navigationLength() && $($settings.finishSelector, element).length > 0));
+      $($settings.lastSelector, element).toggleClass('hidden', (obj.currentIndex() >= obj.navigationLength() && $($settings.finishSelector, element).length > 0));
+      $($settings.finishSelector, element).toggleClass('hidden', (obj.currentIndex() < obj.navigationLength()));
+      $($settings.backSelector, element).toggleClass('disabled', (historyStack.length == 0));
+      $($settings.backSelector, element).toggleClass('hidden', (obj.currentIndex() >= obj.navigationLength() && $($settings.finishSelector, element).length > 0));
+
+      this.rebindClick($($settings.nextSelector, element), obj.next);
+      this.rebindClick($($settings.previousSelector, element), obj.previous);
+      this.rebindClick($($settings.lastSelector, element), obj.last);
+      this.rebindClick($($settings.firstSelector, element), obj.first);
+      this.rebindClick($($settings.finishSelector, element), obj.finish);
+      this.rebindClick($($settings.backSelector, element), obj.back);
+
+      if ($settings.onTabShow && typeof $settings.onTabShow === 'function' &&
+          $settings.onTabShow($activeTab, $navigation, obj.currentIndex()) === false) {
+        return false;
+      }
+    };
+
+    this.next = function(e) {
+      if(element.hasClass('last')) return false;
+      if($settings.onNext && typeof $settings.onNext === 'function' &&
+          $settings.onNext($activeTab, $navigation, obj.nextIndex()) === false) return false;
+
+      var formerIndex = obj.currentIndex();
+      var $index = obj.nextIndex();
+
+      if($index <= obj.navigationLength()) {
+        historyStack.push(formerIndex);
+        var tabLink = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ':eq(' + $index + ') a')[0];
+        new bootstrap.Tab(tabLink).show();
+      }
+    };
+
+    this.previous = function(e) {
+      if(element.hasClass('first')) return false;
+      if($settings.onPrevious && typeof $settings.onPrevious === 'function' &&
+          $settings.onPrevious($activeTab, $navigation, obj.previousIndex()) === false) return false;
+
+      var formerIndex = obj.currentIndex();
+      var $index = obj.previousIndex();
+
+      if($index >= 0) {
+        historyStack.push(formerIndex);
+        var tabLink = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ':eq(' + $index + ') a')[0];
+        new bootstrap.Tab(tabLink).show();
+      }
+    };
+
+    this.first = function(e) {
+      if($settings.onFirst && typeof $settings.onFirst === 'function' &&
+          $settings.onFirst($activeTab, $navigation, obj.firstIndex()) === false) return false;
+      if(element.hasClass('disabled')) return false;
+
+      historyStack.push(obj.currentIndex());
+      var firstLink = $navigation.find(baseItemSelector + ':eq(0) a')[0];
+      new bootstrap.Tab(firstLink).show();
+    };
+
+    this.last = function(e) {
+      if($settings.onLast && typeof $settings.onLast === 'function' &&
+          $settings.onLast($activeTab, $navigation, obj.lastIndex()) === false) return false;
+      if(element.hasClass('disabled')) return false;
+
+      historyStack.push(obj.currentIndex());
+      var lastLink = $navigation.find(baseItemSelector + ':eq(' + obj.navigationLength() + ') a')[0];
+      new bootstrap.Tab(lastLink).show();
+    };
+
+    this.finish = function(e) {
+      if($settings.onFinish && typeof $settings.onFinish === 'function') {
+        $settings.onFinish($activeTab, $navigation, obj.lastIndex());
+      }
+    };
+
+    this.back = function() {
+      if(historyStack.length == 0) return null;
+      var formerIndex = historyStack.pop();
+      if($settings.onBack && typeof $settings.onBack === 'function' &&
+          $settings.onBack($activeTab, $navigation, formerIndex) === false) {
+        historyStack.push(formerIndex);
+        return false;
+      }
+      var backLink = element.find(baseItemSelector + ':eq(' + formerIndex + ') a')[0];
+      new bootstrap.Tab(backLink).show();
+    };
+
+    this.show = function(index) {
+      var tabToShow = isNaN(index) ?
+        element.find(baseItemSelector + ' a[href="#' + index + '"]') :
+        element.find(baseItemSelector + ':eq(' + index + ') a');
+      if(tabToShow.length > 0) {
+        historyStack.push(obj.currentIndex());
+        new bootstrap.Tab(tabToShow[0]).show();
+      }
+    };
+
+    // other functions (disable, enable, hide, display, remove) remain the same...
+
+    var innerTabClick = function(e) {
+      var $ul = $navigation.find(baseItemSelector);
+      var clickedIndex = $ul.index($(e.currentTarget).parent(baseItemSelector));
+      var $clickedTab = $($ul[clickedIndex]);
+      if($settings.onTabClick && typeof $settings.onTabClick === 'function' &&
+          $settings.onTabClick($activeTab, $navigation, obj.currentIndex(), clickedIndex, $clickedTab) === false) {
+        return false;
+      }
+    };
+
+    var innerTabShown = function(e) {
+      var $element = $(e.target).parent();
+      var nextTab = $navigation.find(baseItemSelector).index($element);
+
+      if($element.hasClass('disabled')) return false;
+      if($settings.onTabChange && typeof $settings.onTabChange === 'function' &&
+          $settings.onTabChange($activeTab, $navigation, obj.currentIndex(), nextTab) === false) {
+        return false;
+      }
+
+      $activeTab = $element;
+      obj.fixNavigationButtons();
+    };
+
+    this.resetWizard = function() {
+      $navigation.find('a[data-bs-toggle="tab"]').each(function(_, el) {
+        el.removeEventListener('click', innerTabClick);
+        el.removeEventListener('show.bs.tab', innerTabShown);
+      });
+
+      $navigation = element.find('ul:first', element);
+      $activeTab = $navigation.find(baseItemSelector + '.active', element);
+
+      $navigation.find('a[data-bs-toggle="tab"]').each(function(_, el) {
+        el.addEventListener('click', innerTabClick);
+        el.addEventListener('show.bs.tab', innerTabShown);
+      });
+
+      obj.fixNavigationButtons();
+    };
+
+    $navigation = element.find('ul:first', element);
+    $activeTab = $navigation.find(baseItemSelector + '.active', element);
+
+    if(!$navigation.hasClass($settings.tabClass)) {
+      $navigation.addClass($settings.tabClass);
+    }
+
+    if($settings.onInit && typeof $settings.onInit === 'function') {
+      $settings.onInit($activeTab, $navigation, 0);
+    }
+    if($settings.onShow && typeof $settings.onShow === 'function') {
+      $settings.onShow($activeTab, $navigation, obj.nextIndex());
+    }
+
+    $navigation.find('a[data-bs-toggle="tab"]').each(function(_, el) {
+      el.addEventListener('click', innerTabClick);
+      el.addEventListener('show.bs.tab', innerTabShown);
+    });
+  };
+
+  $.fn.bootstrapWizard = function(options) {
+    if(typeof options == 'string') {
+      var args = Array.prototype.slice.call(arguments, 1);
+      return this.data('bootstrapWizard')[options](args);
+    }
+    return this.each(function(index) {
+      var element = $(this);
+      if(element.data('bootstrapWizard')) return;
+      var wizard = new bootstrapWizardCreate(element, options);
+      element.data('bootstrapWizard', wizard);
+      wizard.fixNavigationButtons();
+    });
+  };
+
+  $.fn.bootstrapWizard.defaults = {
+    withVisible: true,
+    tabClass: 'nav nav-pills',
+    nextSelector: '.wizard li.next',
+    previousSelector: '.wizard li.previous',
+    firstSelector: '.wizard li.first',
+    lastSelector: '.wizard li.last',
+    finishSelector: '.wizard li.finish',
+    backSelector: '.wizard li.back',
+    onShow: null,
+    onInit: null,
+    onNext: null,
+    onPrevious: null,
+    onLast: null,
+    onFirst: null,
+    onFinish: null,
+    onBack: null,
+    onTabChange: null,
+    onTabClick: null,
+    onTabShow: null
+  };
+
+})(jQuery);
+
