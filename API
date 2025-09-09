@@ -1,0 +1,38 @@
+{
+  "ServiceLoader" : {
+    "Body" : {
+      "fromDate" : "202410",
+      "toDate" : "202509"
+    },
+    "Header" : {
+      "ServiceCode" : "33",
+      "encryptedId" : "Zkiqcsmc9govqGQegCM1Yg==",
+      "encryptedCompanyId" : "fZJY0BViVV8LKsUkr8j\/NQ==",
+      "DeviceRegistrationId" : "3DE3263DFA2C10AAE0640010E0E0FA9A",
+      "checksum" : "[CHECKSUM]",
+      "deviceType" : "IOS"
+    }
+  }
+}
+
+https://uat.pbebank.com/publiccpeqr/myCampu-merchant/mobileopen-qrm
+⚠️⚠️Parameters:⚠️⚠️
+{
+  "ServiceLoader" : {
+    "Body" : {
+      "deviceRegistrationId" : "3DE3263DFA2C10AAE0640010E0E0FA9A",
+      "encryptedId" : "Zkiqcsmc9govqGQegCM1Yg==",
+      "encryptedCompanyId" : "fZJY0BViVV8LKsUkr8j\/NQ==",
+      "toDate" : "202509",
+      "fromDate" : "202410"
+    },
+    "Header" : {
+      "ServiceCode" : "33",
+      "encryptedId" : "Zkiqcsmc9govqGQegCM1Yg==",
+      "DeviceRegistrationId" : "3DE3263DFA2C10AAE0640010E0E0FA9A",
+      "encryptedCompanyId" : "fZJY0BViVV8LKsUkr8j\/NQ==",
+      "deviceType" : "IOS",
+      "checksum" : "[CHECKSUM]"
+    }
+  }
+}
