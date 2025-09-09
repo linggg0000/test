@@ -1,0 +1,158 @@
+// AccountController_Mobile.java
+
+@RequestMapping(value = "/mobile-getHomeScreen", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@ResponseBody
+	public MobileJSONResponse getHomeScreen(HttpServletRequest request){
+		try {
+			logger.info("/mobile-getHomeScreen");
+			
+			@SuppressWarnings("unchecked")
+			HashMap<String, Object> jsonBody = (HashMap<String, Object>) request.getAttribute("jsonBody");
+			
+			ApiDeviceBinding apiDeviceBinding = new ApiDeviceBinding();
+			apiDeviceBinding = apiDeviceBindingService.getDeviceBinding(apiDeviceBindingCommon.getApiDeviceBindingOpen(request));
+						
+			ObjectMapper mapper = new ObjectMapper();
+			HomeScreenForm homeScreenForm = mapper.convertValue(jsonBody, HomeScreenForm.class);
+			
+			if(apiDeviceBinding == null) {
+				return mobileJSONResponseError(ErrorCode.ERR_INVALID_DEVICE_ID);
+			}
+			
+			homeScreenForm = merchantHistorySvc.getHomeScreen(homeScreenForm, apiDeviceBinding.getCompanyId(), apiDeviceBinding.getUserId());
+			
+			HashMap<String, Object>response = new HashMap<>();
+			response.put("form", homeScreenForm);
+
+			return mobileJSONResponseSuccess(response);
+		} catch(Exception e) {
+			logger.error(ExceptionHlp.stackTrace(e));
+			return mobileJSONResponseError(ErrorCode.ERR_EXECUTION_ERROR);
+		}
+	}
+
+
+// MerchantHistorySvc,java 
+
+package my.pbb.mypbe.com.svc.qrpay.merchant.history;
+
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import my.pbb.mypbe.com.dto.TransactionSummaryDto;
+import my.pbb.mypbe.com.svc.accountsummary.details.HomeScreenForm;
+import my.pbb.mypbe.com.svc.mware.res.SettlementAccListRes;
+import my.pbb.mypbe.mybatis.object.BoBeneBank;
+import my.pbb.mypbe.mybatis.object.QrEmployee;
+import my.pbb.mypbe.mybatis.object.admin.MB53_trxKhqr;
+
+public interface MerchantHistorySvc {
+
+	public HashMap<String, Object> getSearchMerchantHistory4Months(String fromDate, String toDate, HttpServletRequest request, String nextKeyOnUs,String nextKeyOffUs);
+	public List<MerchantHistoryCount> getTransactionCount(String ind,HttpServletRequest request) throws Exception;
+	public QRMultiTrxInqRes getTransactionStatus(String seqNo, HttpServletRequest request);
+	public List<BoBeneBank> getAllBeneBank();
+	public List<HashMap<String, String>> getSearchMerchantHistoryQRM(String fromDate, String toDate, HttpServletRequest request);
+	public QrEmployee getMerchant(HttpServletRequest request) throws Exception;
+	public List<HashMap<String, String>> getOffUsOnly(HttpServletRequest request);
+	public List<MB53_trxKhqr> getNMonthHistory(HttpServletRequest request);
+	public List<MB53_trxKhqr> getNMonthHistoryWithPaging(HttpServletRequest request);
+	public HomeScreenForm getHomeScreen(HomeScreenForm homeScreenForm, String companyId, String userId) throws Exception;
+	public HomeScreenForm getHomeScreenSpecificDetails(HomeScreenForm homeScreenForm) throws Exception;
+	public TransactionSummaryDto getTransactionSummary(String currency) throws RuntimeException;
+	public SettlementAccListRes getSettlementAccListRBS();
+}
+
+
+// MerchantHistorySvcImpl.java
+
+	@Override
+	public HomeScreenForm getHomeScreen(HomeScreenForm homeScreenForm, String companyId, String userId) throws Exception {
+		
+		HashMap<String, String> searchDetails = new HashMap<>();
+		
+		QrEmployee employee = userLoginDao.retrieveUserAllData(companyId, userId);
+		
+		searchDetails.put("role", employee.getRole());
+		searchDetails.put("fromDate", homeScreenForm.getFromDate() + "01"); //FE to pass YYYYMM only, append with first day of month
+		searchDetails.put("toDate", homeScreenForm.getToDate() + "01");
+		
+		setMonthlyTrxDetailsToForm(getMonthlyTrxFromDBByRole(searchDetails, employee), homeScreenForm);
+		setTodayAndYesterdayDetailsToForm(homeScreenForm);
+		
+		return homeScreenForm;
+	}
+
+	private List<MB53_trxKhqr> getMonthlyTrxFromDBByRole(HashMap<String, String> searchDetails, QrEmployee employee) throws Exception {
+		
+		if(RoleEnum.ADMIN.name().equals(searchDetails.get("role"))) {
+			searchDetails.put("reportSearchValue", employee.getMerchant().getMerchantId().substring(0, 11)); //admin can view all trx for their merchant
+		} else if(RoleEnum.MANAGER.name().equals(searchDetails.get("role"))) {
+			searchDetails.put("reportSearchValue", employee.getSubMerchantId()); //manager can view own outlet and cashier(s) only
+		} else if(RoleEnum.CASHIER.name().equals(searchDetails.get("role"))) {
+			searchDetails.put("reportSearchValue", String.valueOf(employee.getId())); //cashier can view ownself only
+		} else {
+			logger.error("Invalid role from customerInfo session");
+			return null;
+		}
+		searchDetails.put("reportSearchInd", "HOMESCREEN_" + searchDetails.get("role"));
+		
+		return mb53_trxKhqrDao.selectAllFilteredTrxKhqr(searchDetails);
+	}
+
+
+// mb53_trx_khr-map.xml
+
+<select id="selectAllFilteredTrxKhqr" resultMap="MB53_TrxKhqrMap">
+        SELECT 
+        MB53_TRX_DT,
+        MB53_TRX_TIME,
+        MB53_TRX_RBS_STATUS,
+        MB53_TRX_CURRENCY,
+        MB53_TRX_AMT,
+        MB53_MERCHANT_ID,
+        MB53_MERCHANT_NAME,
+        MB53_MERCHANT_OUTLET,
+        MB53_PAYER_BANK,
+        MB53_PAYER_ACC_NO,
+        MB53_PAYER_NAME,
+        MB53_QR_REF_NO,
+        MB53_TRX_FEEAMT,
+        MB53_TRX_PYMT_METHOD,
+        MB53_PAYER_ACC_TYPE,
+        MB53_TERMINAL_LABEL,
+        MB53_TRX_TYPE
+        FROM
+       <include refid="table_MB53_trxKhqr" />
+       <where>
+	MB53_TRX_DT BETWEEN
+	TO_DATE(#{fromDate}, 'YYYYMMDD') AND
+	TO_DATE(#{toDate}, 'YYYYMMDD')
+	<choose>
+		<!-- GET HOME HISTORY DETAILS WITH PAGING -->
+		<when test="reportSearchInd == 'CASHIER'">
+			AND MB53_TERMINAL_LABEL = #{reportSearchValue}
+		</when>
+		<when test="reportSearchInd == 'OUTLET'">
+			AND MB53_MERCHANT_ID = #{reportSearchValue}
+		</when>
+		
+		<!-- GET HOME SCREEN DETAILS BY USER ROLE -->
+		<when test="reportSearchInd == 'HOMESCREEN_CASHIER'">
+			AND MB53_TERMINAL_LABEL = #{reportSearchValue}
+		</when>
+		<when test="reportSearchInd == 'HOMESCREEN_MANAGER'">
+			AND MB53_MERCHANT_ID = #{reportSearchValue}
+		</when>
+		<when test="reportSearchInd == 'HOMESCREEN_ADMIN'">
+			AND MB53_PAYEE_CUSTID = #{reportSearchValue}
+		</when>
+	</choose>
+       </where>
+       ORDER BY
+       MB53_TRX_DT DESC, 
+       MB53_TRX_TIME DESC
+    </select>
+// 
