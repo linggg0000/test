@@ -1,13 +1,129 @@
-var $anchor=e.find('li:has([data-bs-toggle="tab"])'+(b.withVisible?":visible":"")+":eq("+c+") a");
-var anchorEl=$anchor.get(0);
-if(anchorEl){bootstrap.Tab.getOrCreateInstance(anchorEl).show();}
+/**
+ * Bootstrap Wizard vX.X (patched for Bootstrap 5)
+ * Original author: Vincent Gabriel
+ * Patched by: ChatGPT
+ * Notes:
+ *   - Replaced jQuery .tab("show") with Bootstrap 5 Tab API
+ *   - Updated selectors from data-toggle="tab" to data-bs-toggle="tab"
+ *   - Added explicit .show()/.hide() where inline display:none could conflict
+ */
 
+(function($) {
+  "use strict";
 
-var d=c(b).eq(a).find('a[data-bs-toggle="tab"]');
-if(0<d.length){
-  var anchorEl=d.get(0);
-  if(anchorEl){bootstrap.Tab.getOrCreateInstance(anchorEl).show();}
-}
+  $.fn.bootstrapWizard = function(options) {
+    if (typeof options == 'string') {
+      var args = Array.prototype.slice.call(arguments, 1);
+      return this.data('bootstrapWizard')[options].apply(this.data('bootstrapWizard'), args);
+    }
 
+    var defaults = {
+      withVisible: false,
+      tabClass: 'nav nav-pills',
+      nextSelector: '.next',
+      previousSelector: '.previous',
+      firstSelector: '.first',
+      lastSelector: '.last',
+      finishSelector: '.finish',
+      backSelector: '.back',
+      onShow: null,
+      onNext: null,
+      onPrevious: null,
+      onLast: null,
+      onFirst: null,
+      onFinish: null,
+      onBack: null,
+      onTabChange: null,
+      onTabClick: null,
+      onTabShow: null
+    };
 
+    options = $.extend({}, defaults, options);
+    var $wizard = this;
+    var $navigation = this.find('ul:first', $wizard);
+    var $activeTab = $navigation.find('li:has([data-bs-toggle="tab"]):first'); // CHANGED
 
+    var obj = {
+      currentIndex: function() {
+        return $navigation.find('li:has([data-bs-toggle="tab"])').index($activeTab); // CHANGED
+      },
+      firstIndex: function() {
+        return 0;
+      },
+      lastIndex: function() {
+        return $navigation.find('li:has([data-bs-toggle="tab"])').length - 1; // CHANGED
+      },
+      navigationLength: function() {
+        return $navigation.find('li:has([data-bs-toggle="tab"])').length; // CHANGED
+      },
+      // show tab by index
+      show: function(index) {
+        var d = $navigation.find('li:has([data-bs-toggle="tab"])').eq(index).find('a[data-bs-toggle="tab"]'); // CHANGED
+        if (d.length > 0) {
+          var el = d.get(0);
+          if (el) {
+            bootstrap.Tab.getOrCreateInstance(el).show(); // CHANGED
+          }
+        }
+      },
+      // go to next tab
+      next: function() {
+        var i = obj.currentIndex() + 1;
+        if (i > obj.lastIndex()) return;
+        var $anchor = $navigation.find('li:has([data-bs-toggle="tab"])' + (options.withVisible ? ':visible' : '') + ':eq(' + i + ') a'); // CHANGED
+        var el = $anchor.get(0);
+        if (el) {
+          bootstrap.Tab.getOrCreateInstance(el).show(); // CHANGED
+        }
+      },
+      // go to previous tab
+      previous: function() {
+        var i = obj.currentIndex() - 1;
+        if (i < 0) return;
+        var $anchor = $navigation.find('li:has([data-bs-toggle="tab"])' + (options.withVisible ? ':visible' : '') + ':eq(' + i + ') a'); // CHANGED
+        var el = $anchor.get(0);
+        if (el) {
+          bootstrap.Tab.getOrCreateInstance(el).show(); // CHANGED
+        }
+      },
+      // update button states
+      fixNavigationButtons: function() {
+        if (!$activeTab.length) {
+          var firstAnchor = $navigation.find('a:first').get(0);
+          if (firstAnchor) {
+            bootstrap.Tab.getOrCreateInstance(firstAnchor).show(); // CHANGED
+          }
+          $activeTab = $navigation.find('li:has([data-bs-toggle="tab"]):first'); // CHANGED
+        }
+        // prev
+        $(options.previousSelector, $wizard).toggleClass('disabled', obj.firstIndex() >= obj.currentIndex());
+        // next
+        var $next = $(options.nextSelector, $wizard);
+        var nextDisabled = (obj.currentIndex() >= obj.navigationLength());
+        $next.toggleClass('disabled', nextDisabled);
+        var nextHidden = (obj.currentIndex() >= obj.navigationLength() && $(options.finishSelector, $wizard).length > 0);
+        $next.toggleClass('hidden', nextHidden);
+        if (nextHidden) { $next.hide(); } else { $next.show(); } // CHANGED
+        // finish
+        var $finish = $(options.finishSelector, $wizard);
+        if ($finish.length) {
+          var finishVisible = obj.currentIndex() >= obj.lastIndex();
+          $finish.toggleClass('hidden', !finishVisible);
+          if (finishVisible) { $finish.show(); } else { $finish.hide(); } // CHANGED
+        }
+      }
+    };
+
+    this.data('bootstrapWizard', obj);
+
+    // bind tab show event
+    this.find('a[data-bs-toggle="tab"]', $navigation).on('show.bs.tab', function(e) { // CHANGED
+      $activeTab = $(e.target).parent();
+      obj.fixNavigationButtons();
+    });
+
+    obj.fixNavigationButtons();
+
+    return this;
+  };
+})(jQuery);
