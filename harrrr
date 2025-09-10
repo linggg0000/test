@@ -1,13 +1,7 @@
 /*!
  * jQuery twitter bootstrap wizard plugin (patched for Bootstrap 5)
- * Examples and documentation at: http://github.com/VinceG/twitter-bootstrap-wizard
  * version 1.4.2 (patched)
- * Requires jQuery v1.3.2 or later
  * Supports Bootstrap 2.2.x, 2.3.x, 3.0, 5.x (patched)
- * Dual licensed under the MIT and GPL licenses:
- * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
- * Authors: Vadim Vincent Gabriel, Jason Gill, Patched by ChatGPT
  */
 ;(function($) {
 var bootstrapWizardCreate = function(element, options) {
@@ -18,37 +12,56 @@ var bootstrapWizardCreate = function(element, options) {
 	var baseItemSelector = 'li:has([data-bs-toggle="tab"])'; // CHANGED
 	var historyStack = [];
 
-	// Merge options with defaults
 	var $settings = $.extend({}, $.fn.bootstrapWizard.defaults, options);
 	var $activeTab = null;
 	var $navigation = null;
 
-	this.rebindClick = function(selector, fn)
-	{
-		selector.unbind('click', fn).bind('click', fn);
+	this.rebindClick = function(selector, fn) {
+		selector.off('click').on('click', fn); // CHANGED
 	}
 
 	this.fixNavigationButtons = function() {
-		// Get the current active tab
 		if(!$activeTab.length) {
-			// Select first one
-			var firstAnchor = $navigation.find('a:first').get(0); // CHANGED
+			var firstAnchor = $navigation.find('a:first').get(0);
 			if (firstAnchor) {
 				bootstrap.Tab.getOrCreateInstance(firstAnchor).show(); // CHANGED
 			}
 			$activeTab = $navigation.find(baseItemSelector + ':first');
 		}
 
-		// See if we're currently in the first/last then disable the previous and last buttons
+		// previous
 		$($settings.previousSelector, element).toggleClass('disabled', (obj.firstIndex() >= obj.currentIndex()));
-		$($settings.nextSelector, element).toggleClass('disabled', (obj.currentIndex() >= obj.navigationLength()));
-		$($settings.nextSelector, element).toggleClass('hidden', (obj.currentIndex() >= obj.navigationLength() && $($settings.finishSelector, element).length > 0));
-		$($settings.lastSelector, element).toggleClass('hidden', (obj.currentIndex() >= obj.navigationLength() && $($settings.finishSelector, element).length > 0));
-		$($settings.finishSelector, element).toggleClass('hidden', (obj.currentIndex() < obj.navigationLength()));
-		$($settings.backSelector, element).toggleClass('disabled', (historyStack.length == 0));
-		$($settings.backSelector, element).toggleClass('hidden', (obj.currentIndex() >= obj.navigationLength() && $($settings.finishSelector, element).length > 0));
 
-		// We are unbinding and rebinding to ensure single firing and no double-click errors
+		// next
+		var $next = $($settings.nextSelector, element);
+		var nextDisabled = (obj.currentIndex() >= obj.navigationLength());
+		$next.toggleClass('disabled', nextDisabled);
+		var nextHidden = (obj.currentIndex() >= obj.navigationLength() && $($settings.finishSelector, element).length > 0);
+		if (nextHidden) { $next.addClass("d-none"); } else { $next.removeClass("d-none"); } // CHANGED
+
+		// last
+		var $last = $($settings.lastSelector, element);
+		if ($last.length) {
+			if (nextHidden) { $last.addClass("d-none"); } else { $last.removeClass("d-none"); } // CHANGED
+		}
+
+		// finish/reset
+		var $finish = $($settings.finishSelector, element);
+		if ($finish.length) {
+			var finishVisible = (obj.currentIndex() >= obj.navigationLength());
+			if (finishVisible) { $finish.removeClass("d-none"); } else { $finish.addClass("d-none"); } // CHANGED
+		}
+
+		// back
+		var $back = $($settings.backSelector, element);
+		$back.toggleClass('disabled', (historyStack.length == 0));
+		if (obj.currentIndex() >= obj.navigationLength() && $($settings.finishSelector, element).length > 0) {
+			$back.addClass("d-none"); // CHANGED
+		} else {
+			$back.removeClass("d-none"); // CHANGED
+		}
+
+		// bind buttons
 		obj.rebindClick($($settings.nextSelector, element), obj.next);
 		obj.rebindClick($($settings.previousSelector, element), obj.previous);
 		obj.rebindClick($($settings.lastSelector, element), obj.last);
@@ -61,214 +74,125 @@ var bootstrapWizardCreate = function(element, options) {
 		}
 	};
 
+	// === next, previous, first, last, finish, back ===
 	this.next = function(e) {
-		if(element.hasClass('last')) {
-			return false;
-		}
-
-		if($settings.onNext && typeof $settings.onNext === 'function' && $settings.onNext($activeTab, $navigation, obj.nextIndex())===false){
-			return false;
-		}
+		if(element.hasClass('last')) return false;
+		if($settings.onNext && typeof $settings.onNext === 'function' && $settings.onNext($activeTab, $navigation, obj.nextIndex())===false) return false;
 
 		var formerIndex = obj.currentIndex();
 		var $index = obj.nextIndex();
 
-		if($index > obj.navigationLength()) {
-		} else {
+		if($index <= obj.navigationLength()) {
 			historyStack.push(formerIndex);
-			var $anchor = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ':eq(' + $index + ') a'); // CHANGED
-			var el = $anchor.get(0); // CHANGED
+			var $anchor = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ':eq(' + $index + ') a');
+			var el = $anchor.get(0);
 			if (el) { bootstrap.Tab.getOrCreateInstance(el).show(); } // CHANGED
 		}
 	};
 
 	this.previous = function(e) {
-		if(element.hasClass('first')) {
-			return false;
-		}
-
-		if($settings.onPrevious && typeof $settings.onPrevious === 'function' && $settings.onPrevious($activeTab, $navigation, obj.previousIndex())===false){
-			return false;
-		}
+		if(element.hasClass('first')) return false;
+		if($settings.onPrevious && typeof $settings.onPrevious === 'function' && $settings.onPrevious($activeTab, $navigation, obj.previousIndex())===false) return false;
 
 		var formerIndex = obj.currentIndex();
 		var $index = obj.previousIndex();
 
-		if($index < 0) {
-		} else {
+		if($index >= 0) {
 			historyStack.push(formerIndex);
-			var $anchor = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ':eq(' + $index + ') a'); // CHANGED
-			var el = $anchor.get(0); // CHANGED
+			var $anchor = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ':eq(' + $index + ') a');
+			var el = $anchor.get(0);
 			if (el) { bootstrap.Tab.getOrCreateInstance(el).show(); } // CHANGED
 		}
 	};
 
-	this.first = function (e) {
-		if($settings.onFirst && typeof $settings.onFirst === 'function' && $settings.onFirst($activeTab, $navigation, obj.firstIndex())===false){
-			return false;
-		}
-
-		if(element.hasClass('disabled')) {
-			return false;
-		}
+	this.first = function(e) {
+		if($settings.onFirst && typeof $settings.onFirst === 'function' && $settings.onFirst($activeTab, $navigation, obj.firstIndex())===false) return false;
+		if(element.hasClass('disabled')) return false;
 
 		historyStack.push(obj.currentIndex());
-		var el = $navigation.find(baseItemSelector + ':eq(0) a').get(0); // CHANGED
+		var el = $navigation.find(baseItemSelector + ':eq(0) a').get(0);
 		if (el) { bootstrap.Tab.getOrCreateInstance(el).show(); } // CHANGED
 	};
 
 	this.last = function(e) {
-		if($settings.onLast && typeof $settings.onLast === 'function' && $settings.onLast($activeTab, $navigation, obj.lastIndex())===false){
-			return false;
-		}
-
-		if(element.hasClass('disabled')) {
-			return false;
-		}
+		if($settings.onLast && typeof $settings.onLast === 'function' && $settings.onLast($activeTab, $navigation, obj.lastIndex())===false) return false;
+		if(element.hasClass('disabled')) return false;
 
 		historyStack.push(obj.currentIndex());
-		var el = $navigation.find(baseItemSelector + ':eq(' + obj.navigationLength() + ') a').get(0); // CHANGED
+		var el = $navigation.find(baseItemSelector + ':eq(' + obj.navigationLength() + ') a').get(0);
 		if (el) { bootstrap.Tab.getOrCreateInstance(el).show(); } // CHANGED
 	};
 
-	this.finish = function (e) {
+	this.finish = function(e) {
 		if ($settings.onFinish && typeof $settings.onFinish === 'function') {
 			$settings.onFinish($activeTab, $navigation, obj.lastIndex());
 		}
 	};
 
-	this.back = function () {
-		if (historyStack.length == 0) {
-			return null;
-		}
-
+	this.back = function() {
+		if (historyStack.length == 0) return null;
 		var formerIndex = historyStack.pop();
 		if ($settings.onBack && typeof $settings.onBack === 'function' && $settings.onBack($activeTab, $navigation, formerIndex) === false) {
 			historyStack.push(formerIndex);
 			return false;
 		}
-
-		var el = element.find(baseItemSelector + ':eq(' + formerIndex + ') a').get(0); // CHANGED
+		var el = element.find(baseItemSelector + ':eq(' + formerIndex + ') a').get(0);
 		if (el) { bootstrap.Tab.getOrCreateInstance(el).show(); } // CHANGED
 	};
 
+	// === indexing and helpers ===
 	this.currentIndex = function() {
 		return $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '')).index($activeTab);
 	};
-
-	this.firstIndex = function() {
-		return 0;
-	};
-
-	this.lastIndex = function() {
-		return obj.navigationLength();
-	};
-
+	this.firstIndex = function() { return 0; };
+	this.lastIndex = function() { return obj.navigationLength(); };
 	this.getIndex = function(e) {
 		return $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '')).index(e);
 	};
-
 	this.nextIndex = function() {
-		var nextIndexCandidate=this.currentIndex();
-		var nextTabCandidate=null;
-		do {
-			nextIndexCandidate++;
-			nextTabCandidate = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ":eq(" + nextIndexCandidate + ")");
-		} while ((nextTabCandidate)&&(nextTabCandidate.hasClass("disabled")));
-		return nextIndexCandidate;
+		var i = this.currentIndex(); var t=null;
+		do { i++; t=$navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ":eq(" + i + ")"); }
+		while (t && t.hasClass("disabled"));
+		return i;
 	};
 	this.previousIndex = function() {
-		var prevIndexCandidate=this.currentIndex();
-		var prevTabCandidate=null;
-		do {
-			prevIndexCandidate--;
-			prevTabCandidate = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ":eq(" + prevIndexCandidate + ")");
-		} while ((prevTabCandidate)&&(prevTabCandidate.hasClass("disabled")));
-		return prevIndexCandidate;
+		var i = this.currentIndex(); var t=null;
+		do { i--; t=$navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ":eq(" + i + ")"); }
+		while (t && t.hasClass("disabled"));
+		return i;
 	};
 	this.navigationLength = function() {
 		return $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '')).length - 1;
 	};
-	this.activeTab = function() {
-		return $activeTab;
-	};
-	this.nextTab = function() {
-		return $navigation.find(baseItemSelector + ':eq('+(obj.currentIndex()+1)+')').length ? $navigation.find(baseItemSelector + ':eq('+(obj.currentIndex()+1)+')') : null;
-	};
-	this.previousTab = function() {
-		if(obj.currentIndex() <= 0) {
-			return null;
-		}
-		return $navigation.find(baseItemSelector + ':eq('+parseInt(obj.currentIndex()-1)+')');
-	};
-	this.show = function(index) {
-		var tabToShow = isNaN(index) ?
-			element.find(baseItemSelector + ' a[href=\"#' + index + '\"]') :
-			element.find(baseItemSelector + ':eq(' + index + ') a');
-		if (tabToShow.length > 0) {
-			historyStack.push(obj.currentIndex());
-			var el = tabToShow.get(0); // CHANGED
-			if (el) { bootstrap.Tab.getOrCreateInstance(el).show(); } // CHANGED
-		}
-	};
-	this.disable = function (index) {
-		$navigation.find(baseItemSelector + ':eq('+index+')').addClass('disabled');
-	};
-	this.enable = function(index) {
-		$navigation.find(baseItemSelector + ':eq('+index+')').removeClass('disabled');
-	};
-	this.hide = function(index) {
-		$navigation.find(baseItemSelector + ':eq('+index+')').hide();
-	};
-	this.display = function(index) {
-		$navigation.find(baseItemSelector + ':eq('+index+')').show();
-	};
-	this.remove = function(args) {
-		var $index = args[0];
-		var $removeTabPane = typeof args[1] != 'undefined' ? args[1] : false;
-		var $item = $navigation.find(baseItemSelector + ':eq('+$index+')');
 
-		if($removeTabPane) {
-			var $href = $item.find('a').attr('href');
-			$($href).remove();
-		}
-		$item.remove();
-	};
-
+	// === events ===
 	var innerTabClick = function (e) {
 		var $ul = $navigation.find(baseItemSelector);
 		var clickedIndex = $ul.index($(e.currentTarget).parent(baseItemSelector));
 		var $clickedTab = $( $ul[clickedIndex] );
 		if($settings.onTabClick && typeof $settings.onTabClick === 'function' && $settings.onTabClick($activeTab, $navigation, obj.currentIndex(), clickedIndex, $clickedTab)===false){
-			return false;
+		    return false;
 		}
 	};
 
 	var innerTabShown = function (e) {
 		var $element = $(e.target).parent();
 		var nextTab = $navigation.find(baseItemSelector).index($element);
-
-		if($element.hasClass('disabled')) {
-			return false;
-		}
-
-		if($settings.onTabChange && typeof $settings.onTabChange === 'function' && $settings.onTabChange($activeTab, $navigation, obj.currentIndex(), nextTab)===false){
-			return false;
-		}
-
-		$activeTab = $element; // activated tab
+		if($element.hasClass('disabled')) return false;
+		if($settings.onTabChange && typeof $settings.onTabChange === 'function' && $settings.onTabChange($activeTab, $navigation, obj.currentIndex(), nextTab)===false) return false;
+		$activeTab = $element;
 		obj.fixNavigationButtons();
 	};
 
 	this.resetWizard = function() {
-		$('a[data-bs-toggle=\"tab\"]', $navigation).off('click', innerTabClick); // CHANGED
-		$('a[data-bs-toggle=\"tab\"]', $navigation).off('show.bs.tab', innerTabShown); // CHANGED
+		$('a[data-bs-toggle="tab"]', $navigation).off('click', innerTabClick);
+		$('a[data-bs-toggle="tab"]', $navigation).off('show.bs.tab', innerTabShown);
 
 		$navigation = element.find('ul:first', element);
 		$activeTab = $navigation.find(baseItemSelector + '.active', element);
 
-		$('a[data-bs-toggle=\"tab\"]', $navigation).on('click', innerTabClick); // CHANGED
-		$('a[data-bs-toggle=\"tab\"]', $navigation).on('show.bs.tab', innerTabShown); // CHANGED
+		$('a[data-bs-toggle="tab"]', $navigation).on('click', innerTabClick);
+		$('a[data-bs-toggle="tab"]', $navigation).on('show.bs.tab', innerTabShown);
 
 		obj.fixNavigationButtons();
 	};
@@ -276,16 +200,14 @@ var bootstrapWizardCreate = function(element, options) {
 	$navigation = element.find('ul:first', element);
 	$activeTab = $navigation.find(baseItemSelector + '.active', element);
 
-	if(!$navigation.hasClass($settings.tabClass)) {
-		$navigation.addClass($settings.tabClass);
-	}
-
+	if(!$navigation.hasClass($settings.tabClass)) { $navigation.addClass($settings.tabClass); }
 	if($settings.onInit && typeof $settings.onInit === 'function'){ $settings.onInit($activeTab, $navigation, 0); }
 	if($settings.onShow && typeof $settings.onShow === 'function'){ $settings.onShow($activeTab, $navigation, obj.nextIndex()); }
 
-	$('a[data-bs-toggle=\"tab\"]', $navigation).on('click', innerTabClick); // CHANGED
-	$('a[data-bs-toggle=\"tab\"]', $navigation).on('show.bs.tab', innerTabShown); // CHANGED
+	$('a[data-bs-toggle="tab"]', $navigation).on('click', innerTabClick);
+	$('a[data-bs-toggle="tab"]', $navigation).on('show.bs.tab', innerTabShown);
 };
+
 $.fn.bootstrapWizard = function(options) {
 	if (typeof options == 'string') {
 		var args = Array.prototype.slice.call(arguments, 1)
