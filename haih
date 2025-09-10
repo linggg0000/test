@@ -1,0 +1,13 @@
+var $anchor=e.find('li:has([data-bs-toggle="tab"])'+(b.withVisible?":visible":"")+":eq("+c+") a");
+var anchorEl=$anchor.get(0);
+if(anchorEl){bootstrap.Tab.getOrCreateInstance(anchorEl).show();}
+
+
+var d=c(b).eq(a).find('a[data-bs-toggle="tab"]');
+if(0<d.length){
+  var anchorEl=d.get(0);
+  if(anchorEl){bootstrap.Tab.getOrCreateInstance(anchorEl).show();}
+}
+
+
+
