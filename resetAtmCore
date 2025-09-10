@@ -1,0 +1,594 @@
+/*Pbe Reset Password / Reactivate User ID
+ * Using Temporary PW from ATM
+ */
+
+function VerifyCaptcha(captcha){
+	this.captcha = captcha;
+}
+
+function Create(userId, encryptedPwd, trxType){
+	this.userId = userId;
+	this.encryptedPwd = encryptedPwd;
+	this.trxType = trxType;
+}
+
+function getDate(){
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1;
+    var yyyy = today.getFullYear();
+
+    var hours = today.getHours();
+    var minutes = today.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+
+    if (dd < 10) {
+        dd = '0' + dd;
+    }
+    if (mm < 10) {
+        mm = '0' + mm;
+    }
+
+    return yyyy+"-"+mm+"-"+dd+"-"+hours+":"+minutes+ampm;
+}
+
+function randomString(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
+}
+
+
+var encryptedPwd = "";
+
+var SavedTrxCore = function(options){
+	this.generateIdentifyPage = function(tabId) {
+
+		initToolTipATM();
+
+		$(".confirmStep").hide();
+		$(".inputStep").hide();
+		$(".ackStep").hide();
+		$(".inputStep").show();
+
+	}
+
+	this.initToolTipATM = function(){
+		//ToolTip for Temporary PW
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+         tooltipTriggerList.map(function (tooltipTriggerEl) {
+         return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+		$('[data-bs-toggle="tooltip-tempPw"]').tooltip({
+				title: function() {
+					return $('#tempPw_tooltip').html();
+				}
+		    });
+	}
+
+	this.generateCreatePage = function(inputTab, tabId){
+
+		PwCreationPg(options);
+		//buttons
+		$(".inputStep").hide();	
+		$(".list-submit").hide();
+		$(".resetCr").show();
+		$(".nextCr").show();
+
+	}
+
+	this.generateAuthenticatePage = function(inputTab, tabId){
+
+		//top menu
+		$("#identifyTopM").removeClass("active");
+		$("#authTopM").addClass("active");
+		$("#createTopM").removeClass("active");
+		$("#completeTopM").removeClass("active");
+
+		TwoFA(options);
+
+		//buttons
+		$(".list-submit").hide();
+		$(".inputStep").hide();
+		$(".ackStep").hide();
+		$(".previous").hide();
+		$(".fa-next").hide();
+		$(".resetCr").hide();
+		$(".nextCr").hide();
+	}
+
+	this.generateCompletePage = function(inputTab, tabId){
+		// startSpinner();
+
+		console.log("tranStatus: " + options.secfaInput.find("[name=tranStatus]").val());
+		//top menu
+		$("#identifyTopM").removeClass("active");
+		$("#authTopM").removeClass("active");
+		$("#createTopM").removeClass("active");
+		$("#completeTopM").addClass("active");
+
+		initAck(options.secfaInput.find("[name=tranStatus]").val(), options.secfaInput.find("[name=errorCode]").val(), options.secfaInput.find("[name=errorMsg]").val(), options.secfaInput.find("[name=refNo]").val(), options.secfaInput.find("[name=formattedTimeStamp]").val());
+
+		//buttons
+		$(".list-submit").hide();
+		$(".resetCr").hide();
+
+		// stopSpinner();
+	}
+
+	this.initAck = function(tranStatus, errorCode, errorMsg, refNo, formattedTimeStamp){
+		console.log("tranStatus: " + tranStatus + ", errorCode: " + errorCode + ", errorMsg: " + errorMsg + ", refNo: " + refNo + ", formattedTimeStamp: " + formattedTimeStamp);
+		if(tranStatus == "SUCCESS"){
+			console.log("Success");
+			var status = "Reset Password/ Reactivate PBe User ID Successful";
+			var refNo = refNo;
+			var timeStamp = formattedTimeStamp;
+
+			$("#resetAckStatus").text(status);
+			$("#resetAckReferenceNo").html(refNo);
+	   		$("#resetAckTimeStamp").html(timeStamp);
+
+	   		$("#successMsg").html("<br/> You have sucessfully recovered your login details. <br/> <br/>" +
+	   								"You are advised to login immediately with the newly activated ID or newly reset Password.");
+
+	   		$('#resetSuccessMsgDiv').removeClass('d-none');
+	   		$('#resetErrorMsgDiv').addClass('d-none');
+	   		$('#successIcon').addClass('d-none');
+	   		$('#timeOutIcon').addClass('d-none');
+			$('#failedIcon').addClass('d-none');
+
+			$("#successMsgDiv").addClass('d-none');
+			$("#errorMsgDiv").addClass('d-none');
+
+			$('#transStatusSuccessMsg').removeClass('d-none');
+	   		$('#transStatusFailMsg').addClass('d-none');
+
+			$('#lostCard').addClass('d-none');
+
+	   		$(".transSuccessImg").hide();
+	   		$(".returnLoginPg").show();
+	   		$(".returnLoginPgFailed").hide();
+
+	   		$("#successAction").removeClass('d-none');
+		} else if(tranStatus == "FATAL"){
+			console.log("Fatal");
+			var status = "Transaction Unsuccessful";
+
+			$("#resetAckErrorStatus").text(status);
+			$("#errorMsg").html(errorMsg);
+
+	   		$('#resetErrorMsgDiv').removeClass('d-none');
+	   		$('#resetSuccessMsgDiv').addClass('d-none');
+			$('#failedIcon').addClass('d-none');
+	   		$('#successIcon').addClass('d-none');
+	   		$('#timeOutIcon').addClass('d-none');
+
+	   		$("#successMsgDiv").addClass('d-none');
+			$("#errorMsgDiv").addClass('d-none');
+
+	   		$('#transStatusSuccessMsg').addClass('d-none');
+	   		$('#transStatusFailMsg').removeClass('d-none');
+
+			$('#lostCard').addClass('d-none');
+
+	   		$(".transSuccessImg").hide();
+	   		$(".returnLoginPgFailed").show();
+	   		$(".returnLoginPg").hide();
+		} else{
+			console.log("Timeout");
+			var status = "Connection Timeout";
+			var errorCode = errorMsg;
+
+			$("#ackErrorStatus").text(status);
+			$("#errorMsg").html(errorCode);
+
+			$('#resetErrorMsgDiv').addClass('d-none');
+	   		$('#resetSuccessMsgDiv').addClass('d-none');
+			$('#timeOutIcon').removeClass('d-none');
+			$('#failedIcon').addClass('d-none');
+	   		$('#successIcon').addClass('d-none');
+
+	   		$('#ackErrorStatus').removeClass('ackSuccess');
+	   		$('#ackErrorStatus').addClass('ackFailed');
+
+	   		$('#transStatusSuccessMsg').addClass('d-none');
+	   		$('#transStatusFailMsg').removeClass('d-none');
+
+			$('#lostCard').addClass('d-none');
+
+	   		$(".returnLoginPgFailed").show();
+	   		$(".returnLoginPg").hide();
+
+	   		$(".transSuccessImg").hide();
+	   		$("#errorMsgDiv").removeClass('d-none');
+	   		$("#successMsgDiv").addClass('d-none');
+		}
+		$("#transactionStatus").removeClass('d-none');
+	}
+
+	this.initFormEventListeners = function(){
+		
+		//prohibit password field to enter blank space
+		$("#tempPw").on("keypress", function(e){
+			if(e.which === 32){
+				e.preventDefault();
+			}
+		});
+		
+		$("#pw").on("keypress", function(e){
+			if(e.which === 32){
+				e.preventDefault();
+			}
+		});
+		
+		$("#comfirmPw").on("keypress", function(e){
+			if(e.which === 32){
+				e.preventDefault();
+			}
+		});
+
+		$("#captcha").on("keypress", function(e){
+			if(e.which === 32){
+				e.preventDefault();
+			}
+		});
+		
+		//when (identify) reset button clicked
+		options.p.find('.reset').on("click", function(e) {
+			$('.list-submit').hide();
+			$('#captchaImg').attr("src","pbe-generateCaptcha?" + new Date().getTime());
+			resetInputForm();
+		});
+
+		//when (identify) next button clicked
+		options.p.find('.validate').on("click", function(e){
+
+			 if(!$("#userInput").valid()){
+			 	//if incorrect CAPTCHA, clear the temp pw input field
+			 	if($("#captchadiv").hasClass("has-error")){
+			 		$('[name=tempPw]').val("");
+			 	}
+			 	return false;
+    		 }
+			 
+			 startSpinner();
+
+			 $('input[name=trxType]').val("PBE_RESET_ATM_TEMP_PASS");
+
+			 /*Encrypt Password*/
+			 var e = '010001';
+			 var triDesKeyLen = '2'; //(2: k1+k2) (3:k1+k2+k3)
+			 var encryptSessionKeyTriDesKeyLen = '3';
+			 var encryptionMode = '2';
+
+			 var userId = $('[name=userID]').val().toUpperCase();
+			 var tempPass = $('[name=tempPw]').val()
+			 
+			 //encrypt PIN to WebPin4.0
+			var majorversion = WPConstant.WP_Major_Version_4;
+	        var minorversion = WPConstant.WP_Minor_Version_0;
+	        var encryptMode = WPConstant.AES_MODE_CBC;
+	        var hashmode = WPConstant.HASH_MODE_NONE_LONG32;
+	        var exponent = "010001";
+	        var token = getDate();
+	        var szMacData = randomString();
+	        var a = "010008080300";
+	        
+	        encryptedPwd = E2EE.WP_encryptAlphaPINAndGenerateMAC(majorversion, minorversion, hashmode, encryptMode, modulus, exponent, tempPass, a, userId, szMacData);
+			 
+			 setTimeout(function(){
+				 if(!creation(options)){
+				 	console.log("PBe temp password reset / reactivate authenticate failed.");
+					resetInputForm();
+					stopSpinner();
+					return false; 
+				 }
+	
+				$('.list-submit > .btn').removeAttr("disabled");
+				$('.list-submit').show();
+				$('.list-agree').addClass("d-none");
+				$('.validate').hide();
+				$(".next").click();
+				
+				stopSpinner();
+			 }, 10);
+		});
+
+		//when reload CAPTCHA button clicked
+		$('#reloadCap').click(function(e) {
+			$('#captchaImg').attr("src","pbe-generateCaptcha?" + new Date().getTime());
+			$('input[name=captcha]').val("");
+			$("#captchadiv").removeClass("has-error");
+			$("span[for=captcha]").remove();
+		});
+	}
+
+	//validate CAPTCHA for identify page
+	this.validateCaptcha = function(){
+		var captcha = $('[name=captcha]').val().toUpperCase();
+
+		var cap = new VerifyCaptcha(captcha);
+		var captchaStatus = null;
+		AjaxValCap(cap, function(data){
+			if(data.tranStatus == "ERROR"){
+				captchaStatus = false;
+			} else {
+				captchaStatus = true;
+			}
+		});
+		return captchaStatus;
+	}
+	
+	//validate temporary password length for identify page
+	this.validateTempPwdLength = function(tempPwd){
+		if(tempPwd.length == 6){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	//Authenticate user id and password
+	this.creation = function(options){
+		startSpinner();
+		var userId = $('[name=userID]').val().toUpperCase();
+		var trxType = $('input[name=trxType]').val();
+
+		var create = new Create(userId, encryptedPwd, trxType);
+		var createStatus = false;
+
+		AjaxCreate(create, function(data){
+			if(data.tranStatus == "ERROR"){
+				createStatus = false;
+				$("#errText").html(data.statusDesc);
+				$("#errorMessageDialog").modal("show");
+			} else {
+				//$('#userID').text(data.maskedUserId);
+				$('#userID').text($('[name=userID]').val().toUpperCase());
+				options.userId = data.maskedUserId;
+				createStatus = true;
+			}
+		});
+
+		stopSpinner();
+		return createStatus;
+	}
+
+	//reset user input form
+	this.resetInputForm = function(){
+		$('input,select,textarea').not('[type=radio],[type=hidden],[readonly],[disabled],:button').val('');
+		$('.selectpicker').selectpicker('refresh');
+
+		$('.list-agree').removeClass("d-none");
+		$('.list-agree > .btn').attr("disabled", "disabled");
+
+		//reset err msg & red color border
+//		options.a.validate().reset();
+		$("div").removeClass("has-error");
+		$(".help-block").remove();
+		$(".help-block-error").remove();
+	}
+
+	this.initFormValidationRules = function() {
+		jQuery.validator.addMethod("regex", function(value, element, regexpr) {
+			return regexpr.test(value);
+		}, "Invalid Characters.");
+
+		jQuery.validator.addMethod('alphanumeric', function(value, element,
+				params) {
+			var result = this.optional(element)
+					|| /^[a-zA-Z0-9\s]*$/.test(value);
+			return result;
+		}, "Please enter alphanumeric characters.");
+
+		jQuery.validator.addMethod('nospace', function(value, element,
+				params) {
+			var result = this.optional(element)
+					|| /^(?=.\S*$)/.test(value);
+			return result;
+		}, "Space is not allow.");
+
+		jQuery.validator.addMethod('captcha', function(value, element,
+				params) {
+			var result = validateCaptcha();
+			return result;
+		}, "Incorrect Security Code entered.");
+
+		jQuery.validator.addMethod('first2alphabet', function(value, element, params){
+			var result = /[a-zA-Z]{2}[a-zA-Z0-9\s]{4,10}/.test(value);
+			return result;
+		}, "First and Second character must be alphabet.");
+		
+		jQuery.validator.addMethod('tempPwdLength', function(value, element,
+				params) {
+			var result = validateTempPwdLength(value);
+			return result;
+		}, "Invalid Temporary Password format.");
+
+		//validation for identify page
+		options.u.validate({
+			ignore : [],
+			onkeyup : false,
+			errorElement : "span",
+			errorClass : "help-block help-block-error",
+			rules : {
+				userID : {
+					required : true,
+					alphanumeric : true,
+					maxlength : 12,
+					minlength : 6,
+					nospace : true,
+					first2alphabet : true,
+				},
+				tempPw : {
+					required : true,
+					digits : true,
+					tempPwdLength : true,
+					maxlength : 6,
+					nospace : true,
+				},
+				captcha : {
+					required : true,
+					alphanumeric : true,
+					maxlength : 10,
+					nospace : true,
+					captcha : true,
+				}
+			},
+			messages : {
+				userID : {
+					required : "User ID is required.",
+					alphanumeric : "Invalid User ID format.",
+					maxlength : "Invalid User ID format.",
+					minlength : "Minimum characters for User ID is 6.",
+					nospace : "Invalid User ID format.",
+				},
+				tempPw : {
+					required : "Temporary Password is required.",
+					digits : "Invalid Temporary Password format.",
+					tempPwdLength : "Invalid Temporary Password format.",
+					maxlength : "Maximum digits for Temporary Password is 6 only.",
+					nospace : "Invalid Temporary Password format.",
+				},
+				captcha : {
+					required : "Security Code is required.",
+					alphanumeric : "Invalid Security Code format.",
+					maxlength : "Maximum digits for Security Code is 10 only.",
+					nospace : "Invalid Security Code format.",
+					captcha : "Incorrect Security Code entered.",
+				}
+			},
+			invalidHandler : function(e, t) {
+				//focus on the first invalid element
+				var errors = t.numberOfInvalids();
+		        if (errors) {
+		            t.errorList[0].element.focus();
+		        }
+			},
+			highlight : function(e) {
+				$(e).closest(".form-group").addClass("has-error")
+			},
+			unhighlight : function(e) {
+				$(e).closest(".form-group").removeClass("has-error")
+			},
+			success : function(e) {
+				e.closest(".form-group").removeClass("has-error")
+			},
+			submitHandler : function(e) {
+				i.show(), r.hide()
+			},
+			errorPlacement : function(e, r) {
+				if ($(r).is('select')) {
+					r.next().after(e);
+				} else {
+					if (r.parent(".input-group").length > 0){
+						e.insertAfter(r.parent(".input-group"));
+					} else if(r.attr("data-error-container")){
+						e.appendTo(r.attr("data-error-container"));
+					} else if(r.parents(".radio-list").length > 0){
+						e.appendTo(r.parents(".radio-list").attr("data-error-container"));
+					} else if(r.parents(".radio-inline").length > 0){
+						e.appendTo(r.parents(".radio-inline").attr("data-error-container"));
+					} else if(r.parents(".checkbox-list").length > 0){
+						e.appendTo(r.parents(".checkbox-list").attr("data-error-container"));
+					} else if(r.parents(".checkbox-inline").length > 0){
+						e.appendTo(r.parents(".checkbox-inline").attr("data-error-container"));
+					} else if(r.parents(".inline-chkbox").length > 0){ /*for tnc*/
+						e.insertAfter(r.parent(".inline-chkbox"));
+					} else{
+						e.insertAfter(r);
+					}
+				}
+			},
+		});
+	}
+
+	this.AjaxValCap = function(data, callback) {
+		$.ajax({
+			url : "pbe-validate-captcha",
+			type : "POST",
+			cache : false,
+			async: false,
+			data : JSON.stringify(data),
+			contentType : "application/json; charset=utf-8",
+			success : function(result) {
+				callback(result);
+			}
+		});
+	}
+
+	this.AjaxCreate = function(data, callback) {
+		$.ajax({
+			url : "pbe-tempPw-create",
+			type : "POST",
+			cache : false,
+			async: false,
+			data : JSON.stringify(data),
+			contentType : "application/json; charset=utf-8",
+			success : function(result) {
+				var res = JSON.stringify(result);
+				if(res == "\"\""){
+					console.log("res: " + res);
+					displayGeneralErrorBanner();
+				}else{
+					callback(result);
+				}
+			},
+			error : function(result){
+				console.log("create temp password error");
+				displayGeneralErrorBanner();
+			}
+		});
+	}
+
+	this.initFormValidationRules();
+	this.initFormEventListeners();
+	return this;
+};
+
+var initSavedTrxPage = function(formJSON) {
+	var options = {formJSON : formJSON};
+	
+	options.p = $("#ftWizard");
+	options.u = $("#userInput");
+	options.e = $('.alert-danger', options.p);
+	options.secfaInput = $("#secfaInput");
+	options.userId = "";
+
+	var core = SavedTrxCore(options);
+
+	options.p.bootstrapWizard({
+		onTabShow : function(tab, navigation, index) {
+			if (index == 0) {
+				core.generateIdentifyPage("#identify-tab");
+			} else if (index == 1) {
+				core.generateCreatePage("#identify-tab","#create-tab");
+			} else if (index == 2) {
+				core.generateAuthenticatePage("#identify-tab","#authen-tab");
+			} else if (index == 3) {
+				core.generateCompletePage("#identify-tab","#complete-tab");
+			}
+		},
+		onNext : function(tab, navigation, index) {
+			return true;
+		},
+		onPrevious : function(tab, navigation, index) {
+			$('.list-submit').hide();
+			$('.validate').removeClass("d-none");
+			$(".previous").hide();
+			$(".fa-next").hide();
+			if($('#authTopM').attr("active", true)){
+				$('#authTopM').removeClass("active");
+				$('#identifyTopM').addClass("active");
+			}
+		}
+	});
+}
