@@ -1,0 +1,429 @@
+/*!
+ * jQuery twitter bootstrap wizard plugin - Bootstrap 5 Compatible Version
+ * Examples and documentation at: http://github.com/VinceG/twitter-bootstrap-wizard
+ * version 1.4.2 - Bootstrap 5 Patch
+ * Requires jQuery v1.3.2 or later
+ * Supports Bootstrap 5.x
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ * Authors: Vadim Vincent Gabriel (http://vadimg.com), Jason Gill (www.gilluminate.com)
+ * Bootstrap 5 Patch: Updated for Bootstrap 5 compatibility
+ */
+;(function($) {
+var bootstrapWizardCreate = function(element, options) {
+	var element = $(element);
+	var obj = this;
+
+	// PATCH: Updated selector to work with both Bootstrap 4 and 5 tab structures
+	// Bootstrap 5 uses data-bs-toggle="tab" instead of data-toggle="tab"
+	var baseItemSelector = 'li:has([data-toggle="tab"]), li:has([data-bs-toggle="tab"])';
+	var historyStack = [];
+
+	// Merge options with defaults
+	var $settings = $.extend({}, $.fn.bootstrapWizard.defaults, options);
+	var $activeTab = null;
+	var $navigation = null;
+
+	this.rebindClick = function(selector, fn)
+	{
+		// PATCH: Use off/on instead of unbind/bind for jQuery 3+ compatibility
+		selector.off('click', fn).on('click', fn);
+	}
+
+	this.fixNavigationButtons = function() {
+		// Get the current active tab
+		if(!$activeTab.length) {
+			// PATCH: Updated to work with Bootstrap 5 tab structure
+			var firstTabLink = $navigation.find('a:first');
+			if (firstTabLink.length) {
+				// Bootstrap 5 compatibility: try both data-bs-toggle and data-toggle
+				if (firstTabLink.attr('data-bs-toggle') === 'tab') {
+					// Use Bootstrap 5 Tab constructor
+					var firstTab = new bootstrap.Tab(firstTabLink[0]);
+					firstTab.show();
+				} else {
+					// Fallback to jQuery tab method
+					firstTabLink.tab('show');
+				}
+			}
+			$activeTab = $navigation.find(baseItemSelector + ':first');
+		}
+
+		// PATCH: Enhanced button visibility management for Bootstrap 5
+		// See if we're currently in the first/last then disable the previous and last buttons
+		var currentIdx = obj.currentIndex();
+		var firstIdx = obj.firstIndex();
+		var navLength = obj.navigationLength();
+
+		// Previous button management
+		$($settings.previousSelector, element).toggleClass('disabled', (firstIdx >= currentIdx));
+		
+		// Next button management
+		$($settings.nextSelector, element).toggleClass('disabled', (currentIdx >= navLength));
+		$($settings.nextSelector, element).toggleClass('hidden d-none', (currentIdx >= navLength && $($settings.finishSelector, element).length > 0));
+		
+		// Last button management
+		$($settings.lastSelector, element).toggleClass('hidden d-none', (currentIdx >= navLength && $($settings.finishSelector, element).length > 0));
+		
+		// Finish button management
+		$($settings.finishSelector, element).toggleClass('hidden d-none', (currentIdx < navLength));
+		
+		// Back button management
+		$($settings.backSelector, element).toggleClass('disabled', (historyStack.length == 0));
+		$($settings.backSelector, element).toggleClass('hidden d-none', (currentIdx >= navLength && $($settings.finishSelector, element).length > 0));
+
+		// PATCH: Force show buttons that should be visible based on your JSP structure
+		// This ensures the reset and next buttons appear when they should
+		if (currentIdx === 0) {
+			// On first tab (identify), show reset and validate (next) buttons
+			$('.inputStep', element).show();
+			$('.reset', element).show();
+			$('.validate', element).show();
+		}
+
+		// We are unbinding and rebinding to ensure single firing and no double-click errors
+		obj.rebindClick($($settings.nextSelector, element), obj.next);
+		obj.rebindClick($($settings.previousSelector, element), obj.previous);
+		obj.rebindClick($($settings.lastSelector, element), obj.last);
+		obj.rebindClick($($settings.firstSelector, element), obj.first);
+		obj.rebindClick($($settings.finishSelector, element), obj.finish);
+		obj.rebindClick($($settings.backSelector, element), obj.back);
+
+		if($settings.onTabShow && typeof $settings.onTabShow === 'function' && $settings.onTabShow($activeTab, $navigation, obj.currentIndex())===false){
+			return false;
+		}
+	};
+
+	this.next = function(e) {
+		// Prevent default action
+		if (e) e.preventDefault();
+		
+		// If we clicked the last then dont activate this
+		if(element.hasClass('last')) {
+			return false;
+		}
+
+		if($settings.onNext && typeof $settings.onNext === 'function' && $settings.onNext($activeTab, $navigation, obj.nextIndex())===false){
+			return false;
+		}
+
+		var formerIndex = obj.currentIndex();
+		var $index = obj.nextIndex();
+
+	  // Did we click the last button
+		if($index > obj.navigationLength()) {
+		} else {
+		  historyStack.push(formerIndex);
+		  // PATCH: Updated for Bootstrap 5 tab activation
+		  var nextTabLink = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ':eq(' + $index + ') a');
+		  obj.showTab(nextTabLink);
+		}
+	};
+
+	this.previous = function(e) {
+		// Prevent default action
+		if (e) e.preventDefault();
+		
+		// If we clicked the first then dont activate this
+		if(element.hasClass('first')) {
+			return false;
+		}
+
+		if($settings.onPrevious && typeof $settings.onPrevious === 'function' && $settings.onPrevious($activeTab, $navigation, obj.previousIndex())===false){
+			return false;
+		}
+
+		var formerIndex = obj.currentIndex();
+		var $index = obj.previousIndex();
+
+		if($index < 0) {
+		} else {
+		  historyStack.push(formerIndex);
+		  // PATCH: Updated for Bootstrap 5 tab activation
+		  var prevTabLink = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ':eq(' + $index + ') a');
+		  obj.showTab(prevTabLink);
+		}
+	};
+
+	this.first = function (e) {
+		// Prevent default action
+		if (e) e.preventDefault();
+		
+		if($settings.onFirst && typeof $settings.onFirst === 'function' && $settings.onFirst($activeTab, $navigation, obj.firstIndex())===false){
+			return false;
+		}
+
+		// If the element is disabled then we won't do anything
+		if(element.hasClass('disabled')) {
+			return false;
+		}
+
+        historyStack.push(obj.currentIndex());
+		// PATCH: Updated for Bootstrap 5 tab activation
+		var firstTabLink = $navigation.find(baseItemSelector + ':eq(0) a');
+		obj.showTab(firstTabLink);
+	};
+
+	this.last = function(e) {
+		// Prevent default action
+		if (e) e.preventDefault();
+		
+		if($settings.onLast && typeof $settings.onLast === 'function' && $settings.onLast($activeTab, $navigation, obj.lastIndex())===false){
+			return false;
+		}
+
+		// If the element is disabled then we won't do anything
+		if(element.hasClass('disabled')) {
+			return false;
+		}
+
+		historyStack.push(obj.currentIndex());
+		// PATCH: Updated for Bootstrap 5 tab activation
+		var lastTabLink = $navigation.find(baseItemSelector + ':eq(' + obj.navigationLength() + ') a');
+		obj.showTab(lastTabLink);
+	};
+
+	this.finish = function (e) {
+		// Prevent default action
+		if (e) e.preventDefault();
+		
+	  if ($settings.onFinish && typeof $settings.onFinish === 'function') {
+	    $settings.onFinish($activeTab, $navigation, obj.lastIndex());
+	  }
+	};
+
+	this.back = function (e) {
+		// Prevent default action
+		if (e) e.preventDefault();
+		
+	  if (historyStack.length == 0) {
+	    return null;
+	  }
+
+	  var formerIndex = historyStack.pop();
+	  if ($settings.onBack && typeof $settings.onBack === 'function' && $settings.onBack($activeTab, $navigation, formerIndex) === false) {
+	    historyStack.push(formerIndex);
+	    return false;
+	  }
+
+	  // PATCH: Updated for Bootstrap 5 tab activation
+	  var backTabLink = element.find(baseItemSelector + ':eq(' + formerIndex + ') a');
+	  obj.showTab(backTabLink);
+	};
+
+	// PATCH: New method to handle Bootstrap 5 tab activation uniformly
+	this.showTab = function(tabLink) {
+		if (tabLink.length) {
+			// Check if this is Bootstrap 5 or Bootstrap 4/3
+			if (tabLink.attr('data-bs-toggle') === 'tab') {
+				// Use Bootstrap 5 Tab constructor
+				var tab = new bootstrap.Tab(tabLink[0]);
+				tab.show();
+			} else {
+				// Fallback to jQuery tab method for older Bootstrap versions
+				tabLink.tab('show');
+			}
+		}
+	};
+
+	this.currentIndex = function() {
+		return $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '')).index($activeTab);
+	};
+
+	this.firstIndex = function() {
+		return 0;
+	};
+
+	this.lastIndex = function() {
+		return obj.navigationLength();
+	};
+	
+	this.getIndex = function(e) {
+		return $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '')).index(e);
+	};
+	
+	this.nextIndex = function() {
+		var nextIndexCandidate=this.currentIndex();
+		var nextTabCandidate=null;
+		do {
+			nextIndexCandidate++;
+			nextTabCandidate = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ":eq(" + nextIndexCandidate + ")");
+		} while ((nextTabCandidate)&&(nextTabCandidate.hasClass("disabled")));
+		return nextIndexCandidate;
+	};
+	this.previousIndex = function() {
+		var prevIndexCandidate=this.currentIndex();
+		var prevTabCandidate=null;
+		do {
+			prevIndexCandidate--;
+			prevTabCandidate = $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '') + ":eq(" + prevIndexCandidate + ")");
+		} while ((prevTabCandidate)&&(prevTabCandidate.hasClass("disabled")));
+		return prevIndexCandidate;
+	};	
+	this.navigationLength = function() {
+		return $navigation.find(baseItemSelector + ($settings.withVisible ? ':visible' : '')).length - 1;
+	};
+	this.activeTab = function() {
+		return $activeTab;
+	};
+	this.nextTab = function() {
+		return $navigation.find(baseItemSelector + ':eq('+(obj.currentIndex()+1)+')').length ? $navigation.find(baseItemSelector + ':eq('+(obj.currentIndex()+1)+')') : null;
+	};
+	this.previousTab = function() {
+		if(obj.currentIndex() <= 0) {
+			return null;
+		}
+		return $navigation.find(baseItemSelector + ':eq('+parseInt(obj.currentIndex()-1)+')');
+	};
+	this.show = function(index) {
+	  var tabToShow = isNaN(index) ?
+      element.find(baseItemSelector + ' a[href="#' + index + '"]') :
+      element.find(baseItemSelector + ':eq(' + index + ') a');
+	  if (tabToShow.length > 0) {
+	    historyStack.push(obj.currentIndex());
+	    // PATCH: Use new showTab method
+	    obj.showTab(tabToShow);
+	  }
+	};
+	this.disable = function (index) {
+		$navigation.find(baseItemSelector + ':eq('+index+')').addClass('disabled');
+	};
+	this.enable = function(index) {
+		$navigation.find(baseItemSelector + ':eq('+index+')').removeClass('disabled');
+	};
+	this.hide = function(index) {
+		$navigation.find(baseItemSelector + ':eq('+index+')').hide();
+	};
+	this.display = function(index) {
+		$navigation.find(baseItemSelector + ':eq('+index+')').show();
+	};
+	this.remove = function(args) {
+		var $index = args[0];
+		var $removeTabPane = typeof args[1] != 'undefined' ? args[1] : false;
+		var $item = $navigation.find(baseItemSelector + ':eq('+$index+')');
+
+		// Remove the tab pane first if needed
+		if($removeTabPane) {
+			var $href = $item.find('a').attr('href');
+			$($href).remove();
+		}
+
+		// Remove menu item
+		$item.remove();
+	};
+
+	var innerTabClick = function (e) {
+		// Get the index of the clicked tab
+		var $ul = $navigation.find(baseItemSelector);
+		var clickedIndex = $ul.index($(e.currentTarget).parent(baseItemSelector));
+		var $clickedTab = $( $ul[clickedIndex] );
+		if($settings.onTabClick && typeof $settings.onTabClick === 'function' && $settings.onTabClick($activeTab, $navigation, obj.currentIndex(), clickedIndex, $clickedTab)===false){
+		    return false;
+		}
+	};
+
+	var innerTabShown = function (e) {  
+		var $element = $(e.target).parent();
+		var nextTab = $navigation.find(baseItemSelector).index($element);
+
+		// If it's disabled then do not change
+		if($element.hasClass('disabled')) {
+			return false;
+		}
+
+		if($settings.onTabChange && typeof $settings.onTabChange === 'function' && $settings.onTabChange($activeTab, $navigation, obj.currentIndex(), nextTab)===false){
+				return false;
+		}
+
+		$activeTab = $element; // activated tab
+		obj.fixNavigationButtons();
+	};
+
+	this.resetWizard = function() {
+		// PATCH: Updated to handle both Bootstrap 4 and 5 selectors
+		// remove the existing handlers
+		$('a[data-toggle="tab"], a[data-bs-toggle="tab"]', $navigation).off('click', innerTabClick);
+		$('a[data-toggle="tab"], a[data-bs-toggle="tab"]', $navigation).off('show show.bs.tab shown.bs.tab', innerTabShown);
+
+		// reset elements based on current state of the DOM
+		$navigation = element.find('ul:first', element);
+		$activeTab = $navigation.find(baseItemSelector + '.active', element);
+
+		// re-add handlers
+		$('a[data-toggle="tab"], a[data-bs-toggle="tab"]', $navigation).on('click', innerTabClick);
+		$('a[data-toggle="tab"], a[data-bs-toggle="tab"]', $navigation).on('show show.bs.tab shown.bs.tab', innerTabShown);
+
+		obj.fixNavigationButtons();
+	};
+
+	$navigation = element.find('ul:first', element);
+	$activeTab = $navigation.find(baseItemSelector + '.active', element);
+
+	if(!$navigation.hasClass($settings.tabClass)) {
+		$navigation.addClass($settings.tabClass);
+	}
+
+	// Load onInit
+	if($settings.onInit && typeof $settings.onInit === 'function'){
+		$settings.onInit($activeTab, $navigation, 0);
+	}
+
+	// Load onShow
+	if($settings.onShow && typeof $settings.onShow === 'function'){
+		$settings.onShow($activeTab, $navigation, obj.nextIndex());
+	}
+
+	// PATCH: Updated event binding to support both Bootstrap 4 and 5
+	$('a[data-toggle="tab"], a[data-bs-toggle="tab"]', $navigation).on('click', innerTabClick);
+
+	// PATCH: Updated to handle Bootstrap 5 events (shown.bs.tab instead of show.bs.tab for completion events)
+	$('a[data-toggle="tab"], a[data-bs-toggle="tab"]', $navigation).on('show show.bs.tab shown.bs.tab', innerTabShown);
+};
+
+$.fn.bootstrapWizard = function(options) {
+	//expose methods
+	if (typeof options == 'string') {
+		var args = Array.prototype.slice.call(arguments, 1)
+		if(args.length === 1) {
+			args.toString();
+		}
+		return this.data('bootstrapWizard')[options](args);
+	}
+	return this.each(function(index){
+		var element = $(this);
+		// Return early if this element already has a plugin instance
+		if (element.data('bootstrapWizard')) return;
+		// pass options to plugin constructor
+		var wizard = new bootstrapWizardCreate(element, options);
+		// Store plugin object in this element's data
+		element.data('bootstrapWizard', wizard);
+		// and then trigger initial change
+		wizard.fixNavigationButtons();
+	});
+};
+
+// PATCH: Updated default tab class for Bootstrap 5 compatibility
+$.fn.bootstrapWizard.defaults = {
+	withVisible:      true,
+	tabClass:         'nav nav-pills', // Works with Bootstrap 5
+	nextSelector:     '.wizard li.next',
+	previousSelector: '.wizard li.previous',
+	firstSelector:    '.wizard li.first',
+	lastSelector:     '.wizard li.last',
+  finishSelector:   '.wizard li.finish',
+	backSelector:     '.wizard li.back',
+	onShow:           null,
+	onInit:           null,
+	onNext:           null,
+	onPrevious:       null,
+	onLast:           null,
+	onFirst:          null,
+  onFinish:         null,
+  onBack:           null,
+	onTabChange:      null,
+	onTabClick:       null,
+	onTabShow:        null
+};
+
+})(jQuery);
