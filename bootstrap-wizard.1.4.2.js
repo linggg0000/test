@@ -1,3 +1,5 @@
+// botstrap-wizard.1.4.2.js
+
 /*!
  * jQuery twitter bootstrap wizard plugin
  * Examples and documentation at: http://github.com/VinceG/twitter-bootstrap-wizard
