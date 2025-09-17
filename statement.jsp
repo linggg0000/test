@@ -113,10 +113,10 @@
                         </div>
                     </div>
 
-                    <!-- Tittle and description -->
-                    <div class="col border-danger d-flex align-items-center pt-2">
-                        <h5 class="title">View Transaction History</h5>
-                        <p class="description">View and filter your transaction history.</p>
+                    <!-- Title and description -->
+                    <div class="col-10 border-danger d-flex flex-column align-items-center justify-content-start pt-2">
+                        <h5 class="cardsTitle border">View Transaction History</h5>
+                        <p class="cardsDesc border">View and filter your transaction history.</p>
                     </div>
                 </div>
             </a>
@@ -134,10 +134,10 @@
                         </div>
                     </div>
 
-                    <!-- Tittle and description -->
-                    <div class="col border-danger d-flex align-items-center pt-2">
-                        <h5 class="title">View Transaction History</h5>
-                        <p class="description">View and filter your transaction history.</p>
+                    <!-- Title and description -->
+                    <div class="col-10 border-danger d-flex flex-column align-items-center justify-content-start pt-2">
+                        <h5 class="cardsTitle border">View Transaction History</h5>
+                        <p class="cardsDesc border">View and filter your transaction history.</p>
                     </div>
                 </div>
             </a>
