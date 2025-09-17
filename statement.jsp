@@ -15,7 +15,7 @@
 
 .statementCards {
     background-color: #F9F9F9;
-    height: 85px;
+    min-height: 100px;
 }
 
 .icon {
@@ -24,8 +24,8 @@
 }
 
 .iconContainer {
-    // max-width: 55px;
-    max-height: 55px;
+    width: 55px;
+    height: 55px;
     background-color: #FFFFFF;
     display: flex;
     justify-content: center;
@@ -46,12 +46,28 @@
     color: #ffffff;
 }
 
-. plusIcon {
+.cardsTitle {
+    margin-top: 0.4rem;
+    transition: transform 0.3s ease;
 }
 
-. plusIconContainer {
-    width: 40px;
-    height: 40px;
+.cardsDesc {
+    color: #777777;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+    margin-top: 0.3rem;
+}
+
+/* Hover effect */
+.statementCards:hover .cardsTitle {
+    transform: translateY(-8px);
+}
+
+.statementCards:hover .cardsDesc {
+    opacity: 1;
+    transform: translateY(0);
+    margin-top: 0.6rem;
 }
 
 
@@ -77,9 +93,10 @@
                         </div>
                     </div>
 
-                    <!-- Tittle and description -->
-                    <div class="col border-info-subtle d-flex align-items-center pt-1">
-                        <h5>View Transaction History</h5>
+                    <!-- Title and description -->
+                    <div class="col-10 border-danger d-flex flex-column align-items-center justify-content-start pt-2">
+                        <h5 class="cardsTitle border">View Transaction History</h5>
+                        <p class="cardsDesc border">View and filter your transaction history.</p>
                     </div>
                 </div>
             </a>
@@ -90,15 +107,16 @@
             <a id="#">
                 <div class="row border p-2 rounded-2 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 border d-flex justify-content-center">
-                        <div class="iconContainer">
+                    <div class="col-2 border d-flex justify-content-center align-items-center">
+                        <div class="iconContainer border-danger">
                             <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
                         </div>
                     </div>
 
                     <!-- Tittle and description -->
-                    <div class="col border d-flex align-items-center pt-1">
-                        <h5>View Transaction History</h5>
+                    <div class="col border-danger d-flex align-items-center pt-2">
+                        <h5 class="title">View Transaction History</h5>
+                        <p class="description">View and filter your transaction history.</p>
                     </div>
                 </div>
             </a>
@@ -110,15 +128,16 @@
             <a id="#">
                 <div class="row border p-2 rounded-2 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 border d-flex justify-content-center">
-                        <div class="iconContainer">
+                    <div class="col-2 border d-flex justify-content-center align-items-center">
+                        <div class="iconContainer border-danger">
                             <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
                         </div>
                     </div>
 
                     <!-- Tittle and description -->
-                    <div class="col border d-flex align-items-center pt-1">
-                        <h5>View Transaction History</h5>
+                    <div class="col border-danger d-flex align-items-center pt-2">
+                        <h5 class="title">View Transaction History</h5>
+                        <p class="description">View and filter your transaction history.</p>
                     </div>
                 </div>
             </a>
