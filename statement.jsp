@@ -37,11 +37,11 @@
 
 .statementCards {
     background-color: #F9F9F9;
-    min-height: 90px;
+    min-height: 120px;
     margin-bottom: 10px;
     overflow: hidden;
     transition: max-height 0.5s ease;
-    max-height: 90px;
+    max-height: 120px;
     border: 2px dotted blue;
 }
 
@@ -74,8 +74,8 @@
     justify-content: center;
     align-items: start;
     padding-top: 17px;
-    min-height: 70px;
-    max-height: 70px;
+    min-height: 100px;
+    max-height: 100px;
     transition: all 0.5s ease;
     border: 2px solid red;
     overflow: hidden;
@@ -100,11 +100,11 @@
 
 /* Hover effect */
 .statementCards:hover {
-    max-height: 200px;
+    max-height: 300px;
 }
 
 .statementCards:hover .cardsContent {
-    max-height: 200px;
+    max-height: 300px;
 }
 
 .statementCards:hover .cardsTitle {
@@ -118,6 +118,16 @@
     // margin-top: 20px;
 }
 
+.test {
+    margin-top: 15px;
+    transition: transform 0.5s ease;
+    font-size: 1.15rem;
+    border: 2px solid blue;
+}
+
+.statementCards:hover .test {
+    margin-top: 0px;
+}
 
 </style>
 
@@ -249,7 +259,7 @@
                     <!-- Title and description -->
                     <div class="col-10">
                         <div class="cardsContent">
-                            <label class="cardsTitle fw-bold">Convert to Statement Savings Account</label>
+                            <label class="fw-bold test">Convert to Statement Savings Account</label>
                             <label class="cardsDesc">Go green by switching your Passbook Savings Account to Statement Savings Account.</label>
                         </div>
                     </div>
