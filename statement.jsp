@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt"%>
@@ -41,12 +42,12 @@
     overflow: hidden;
     transition: max-height 0.5s ease;
     max-height: 90px;
+    border: 2px dotted blue;
 }
 
-.iconContent {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.icon {
+    width: 32px;
+    height: 32px;
 }
 
 .iconContainer {
@@ -61,26 +62,24 @@
     border: 2px;
 }
 
-.icon {
-    width: 32px;
-    height: 32px;
-}
-
 .cardsContent {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: start;
     padding-top: 17px;
-    height: 100%;
-    // vertical-align: middle;
+    min-height: 70px;
+    max-height: 70px;
     transition: all 0.5s ease;
+    border: 2px solid red;
+    overflow: hidden;
 }
 
 .cardsTitle {
     // padding-top: 23px;
     transition: transform 0.5s ease;
-    font-size: 1.15rem
+    font-size: 1.15rem;
+    border: 2px solid blue;
 }
 
 .cardsDesc {
@@ -89,7 +88,8 @@
     transform: translateY(20px);
     transition: all 0.5s ease;
     // margin-top: 5px;
-    font-size: 1.0rem
+    font-size: 1.0rem;
+    border: 2px solid green;
 }
 
 /* Hover effect */
@@ -97,9 +97,13 @@
     max-height: 200px;
 }
 
+.statementCards:hover .cardsContent {
+    max-height: 200px;
+}
+
 .statementCards:hover .cardsTitle {
     transform: translateY(-12px);
-    // padding-top: 0;
+    padding-top: 0;
 }
 
 .statementCards:hover .cardsDesc {
@@ -134,19 +138,19 @@
     <div class="row">
 
         <!-- View Transaction History-->
-        <div class="col-12 col-lg-6 px-4 py-2 border border-success">
+        <div class="col-12 col-lg-6 px-4 py-2">
             <a id="#">
-                <div class="row p-2 rounded-3 statementCards border border-info">
+                <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 iconContent border border-primary">
-                        <div class="iconContainer border border-danger">
+                    <div class="col-2 d-flex justify-content-center align-items-center">
+                        <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
                         </div>
                     </div>
 
                     <!-- Title and description -->
-                    <div class="col-10 border border-warning">
-                        <div class="cardsContent border border-danger">
+                    <div class="col-10">
+                        <div class="cardsContent">
                             <label class="cardsTitle fw-bold">View Transaction History</label>
                             <label class="cardsDesc">View and filter your transaction history.</label>
                         </div>
@@ -161,7 +165,7 @@
             <a id="#">
                 <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 iconContent">
+                    <div class="col-2 d-flex justify-content-center align-items-center">
                         <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
                         </div>
@@ -184,7 +188,7 @@
             <a id="#">
                 <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 iconContent">
+                    <div class="col-2 d-flex justify-content-center align-items-center">
                         <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/registerEStatement.png" alt="Convert Statement">
                         </div>
@@ -207,7 +211,7 @@
             <a id="#">
                 <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 iconContent">
+                    <div class="col-2 d-flex justify-content-center align-items-center">
                         <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/requestStatement.png" alt="Convert Statement">
                         </div>
@@ -230,7 +234,7 @@
             <a id="#">
                 <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 iconContent">
+                    <div class="col-2 d-flex justify-content-center align-items-center">
                         <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/viewEStatement.png" alt="Convert Statement">
                         </div>
@@ -246,7 +250,7 @@
                 </div>
             </a>
         </div>
-
+        
 
     </div>
 </div>
@@ -276,4 +280,3 @@
 		  });
 	})();
 </script>
-
