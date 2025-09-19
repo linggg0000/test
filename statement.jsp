@@ -38,11 +38,17 @@
     background-color: #F9F9F9;
     min-height: 90px;
     margin-bottom: 10px;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+    max-height: 90px;
 }
 
-.icon {
-    width: 32px;
-    height: 32px;
+.iconContent {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    transition: all 0.5s ease;
 }
 
 .iconContainer {
@@ -57,6 +63,11 @@
     border: 2px;
 }
 
+.icon {
+    width: 32px;
+    height: 32px;
+}
+
 .cardsContent {
     display: flex;
     flex-direction: column;
@@ -65,6 +76,7 @@
     padding-top: 17px;
     height: 100%;
     // vertical-align: middle;
+    transition: all 0.5s ease;
 }
 
 .cardsTitle {
@@ -83,9 +95,13 @@
 }
 
 /* Hover effect */
+.statementCards:hover {
+    max-height: 200px;
+}
+
 .statementCards:hover .cardsTitle {
     transform: translateY(-12px);
-    padding-top: 0;
+    // padding-top: 0;
 }
 
 .statementCards:hover .cardsDesc {
@@ -120,12 +136,12 @@
     <div class="row">
 
         <!-- View Transaction History-->
-        <div class="col-12 col-lg-6 px-4 py-2">
+        <div class="col-12 col-lg-6 px-4 py-2 border border-success">
             <a id="#">
-                <div class="row p-2 rounded-3 statementCards">
+                <div class="row p-2 rounded-3 statementCards border border-info">
                     <!-- Icon -->
-                    <div class="col-2 d-flex justify-content-center align-items-center">
-                        <div class="iconContainer">
+                    <div class="col-2 iconContent border border-primary">
+                        <div class="iconContainer border border-danger">
                             <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
                         </div>
                     </div>
@@ -147,7 +163,7 @@
             <a id="#">
                 <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 d-flex justify-content-center align-items-center">
+                    <div class="col-2 iconContent">
                         <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
                         </div>
@@ -170,7 +186,7 @@
             <a id="#">
                 <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 d-flex justify-content-center align-items-center">
+                    <div class="col-2 iconContent">
                         <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/registerEStatement.png" alt="Convert Statement">
                         </div>
@@ -193,7 +209,7 @@
             <a id="#">
                 <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 d-flex justify-content-center align-items-center">
+                    <div class="col-2 iconContent">
                         <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/requestStatement.png" alt="Convert Statement">
                         </div>
@@ -216,7 +232,7 @@
             <a id="#">
                 <div class="row p-2 rounded-3 statementCards">
                     <!-- Icon -->
-                    <div class="col-2 d-flex justify-content-center align-items-center">
+                    <div class="col-2 iconContent">
                         <div class="iconContainer">
                             <img class="icon" src="resources/images/newIcon/statement/viewEStatement.png" alt="Convert Statement">
                         </div>
@@ -232,7 +248,7 @@
                 </div>
             </a>
         </div>
-        
+
 
     </div>
 </div>
