@@ -47,8 +47,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    transition: all 0.5s ease;
 }
 
 .iconContainer {
@@ -147,8 +145,8 @@
                     </div>
 
                     <!-- Title and description -->
-                    <div class="col-10">
-                        <div class="cardsContent">
+                    <div class="col-10 border border-warning">
+                        <div class="cardsContent border border-danger">
                             <label class="cardsTitle fw-bold">View Transaction History</label>
                             <label class="cardsDesc">View and filter your transaction history.</label>
                         </div>
