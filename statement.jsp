@@ -37,11 +37,11 @@
 
 .statementCards {
     background-color: #F9F9F9;
-    min-height: 120px;
+    min-height: 90px;
     margin-bottom: 10px;
     overflow: hidden;
     transition: max-height 0.5s ease;
-    max-height: 120px;
+    max-height: 90px;
     border: 2px dotted blue;
 }
 
@@ -74,8 +74,8 @@
     justify-content: center;
     align-items: start;
     padding-top: 17px;
-    min-height: 100px;
-    max-height: 100px;
+    min-height: 70px;
+    max-height: 70px;
     transition: all 0.5s ease;
     border: 2px solid red;
     overflow: hidden;
@@ -100,11 +100,11 @@
 
 /* Hover effect */
 .statementCards:hover {
-    max-height: 300px;
+    max-height: 200px;
 }
 
 .statementCards:hover .cardsContent {
-    max-height: 300px;
+    max-height: 200px;
 }
 
 .statementCards:hover .cardsTitle {
