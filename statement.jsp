@@ -1,3 +1,5 @@
+// 22/9/2025 2.42pm 
+// before arrow icon
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -37,11 +39,11 @@
 
 .statementCards {
     background-color: #F9F9F9;
-    min-height: 120px;
+    min-height: 90px;
     margin-bottom: 10px;
     overflow: hidden;
     transition: max-height 0.5s ease;
-    max-height: 120px;
+    max-height: 90px;
     border: 2px dotted blue;
 }
 
@@ -74,8 +76,8 @@
     justify-content: center;
     align-items: start;
     padding-top: 17px;
-    min-height: 100px;
-    max-height: 100px;
+    min-height: 70px;
+    max-height: 70px;
     transition: all 0.5s ease;
     border: 2px solid red;
     overflow: hidden;
@@ -91,7 +93,7 @@
 .cardsDesc {
     color: #777777;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(80px);
     transition: all 0.5s ease;
     // margin-top: 5px;
     font-size: 1.0rem;
@@ -165,7 +167,7 @@
                     </div>
 
                     <!-- Title and description -->
-                    <div class="col-10">
+                    <div class="col-9">
                         <div class="cardsContent">
                             <label class="cardsTitle fw-bold">View Transaction History</label>
                             <label class="cardsDesc">View and filter your transaction history.</label>
@@ -259,7 +261,7 @@
                     <!-- Title and description -->
                     <div class="col-10">
                         <div class="cardsContent">
-                            <label class="fw-bold test">Convert to Statement Savings Account</label>
+                            <label class="fw-bold cardsTitle">Convert to Statement Savings Account</label>
                             <label class="cardsDesc">Go green by switching your Passbook Savings Account to Statement Savings Account.</label>
                         </div>
                     </div>
