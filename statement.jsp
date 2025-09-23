@@ -1,3 +1,4 @@
+// 1. view transaction icon need to change
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -40,9 +41,9 @@
     min-height: 90px;
     margin-bottom: 10px;
     overflow: hidden;
-    transition: max-height 0.5s ease;
+    transition: max-height 0.6s ease;
     max-height: 90px;
-    border: 2px dotted blue;
+    // border: 2px dotted blue;
 }
 
 .iconContainer {
@@ -73,11 +74,11 @@
     flex-direction: column;
     justify-content: center;
     align-items: start;
-    padding-top: 20px;
+    padding-top: 22px;
     min-height: 70px;
     max-height: 70px;
-    transition: all 0.5s ease;
-    border: 2px solid red;
+    transition: all 0.6s ease;
+    // border: 2px solid red;
     overflow: hidden;
 }
 
@@ -85,7 +86,7 @@
     // padding-top: 23px;
     transition: transform 0.5s ease;
     font-size: 1.15rem;
-    border: 2px solid blue;
+    // border: 2px solid blue;
 }
 
 .cardsDesc {
@@ -95,8 +96,13 @@
     transition: all 0.5s ease;
     // margin-top: 5px;
     font-size: 1.0rem;
-    border: 2px solid green;
+    // border: 2px solid green;
 }
+
+.arrowIcon {
+    color: #575757;
+}
+
 
 /* Hover effect */
 .statementCards:hover {
@@ -118,6 +124,7 @@
     // margin-top: 20px;
 }
 
+/*
 .test {
     margin-top: 15px;
     transition: transform 0.5s ease;
@@ -128,10 +135,7 @@
 .statementCards:hover .test {
     margin-top: 0px;
 }
-
-.arrowIcon {
-    color: #575757;
-}
+*/
 
 </style>
 
@@ -192,7 +196,7 @@
                     <!-- Icon -->
                     <div class="col-2 iconContainer">
                         <div class="iconBackground">
-                            <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                            <img class="icon" src="resources/images/newIcon/statement/viewEStatement.png" alt="Convert Statement">
                         </div>
                     </div>
 
@@ -276,7 +280,7 @@
                     <!-- Icon -->
                     <div class="col-2 iconContainer">
                         <div class="iconBackground">
-                            <img class="icon" src="resources/images/newIcon/statement/viewEStatement.png" alt="Convert Statement">
+                            <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
                         </div>
                     </div>
 
