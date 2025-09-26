@@ -49,11 +49,21 @@
     border: 1px solid blue;
 }
 
-/* Cards */
+/* Section */
+
+.sectionHeader {
+    font-size: 24px;
+    margin:
+}
+
+/* Section - Cards */
 
 .cardDiv {
-    height: 100px;
+    overflow-x: auto;
     overflow-y: hidden;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center
 }
 
 .cardDiv::-webkit-scrollbar {
@@ -62,18 +72,21 @@
 
 .cards {
     background-color: #EEEEEE;
-    justify-content: center;
-    height: 82px;
     width: 270px;
+    height: 153px;
+    margin-right: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    column-gap: 0;
 }
 
-/* Cards - Icon */
+/* Section - Cards - Icon */
 
 .iconContainer {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px dotted green;
 }
 
 .iconBackground {
@@ -93,6 +106,26 @@
     height: 32px;
 }
 
+/* Section - Cards - Cards Content */
+
+.cardsContent {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cards label {
+    cursor: pointer;
+}
+
+.cardsContentBottom {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: start;
+    column-gap: 0;
+}
+
 </style>
 
 <div class="container-fluid gx-1 gx-lg-0 mt-3 mt-lg-5 px-4 px-lg-0 mx-5 mx-xl-5 float-end mainDiv border">
@@ -108,115 +141,173 @@
         </div>
     </div>
 
-    <!-- Back button & Title -->
+    <!-- Back button -->
     <div class="bg-black rounded-circle arrowContainer mb-4 d-flex justify-content-center align-items-center">
         <i class="bi bi-chevron-left leftArrow"></i>
     </div>
-    <h1 class="text-black mb-4">My Accounts</h1>
+
+    <!-- Page title -->
+    <h1 class="text-black mb-4 border border-primary-subtle">My Accounts</h1>
 
 
-    <!-- My Current / Savings -->
+    <!-- Section 1: My Current / Savings -->
     <div class="row sectionDiv border border-danger">
 
-        <div class="sectionHeader d-flex border border-info p-3 justify-content-between">
-            <p class="fw-bold border border-primary m-0 p-0">My Current / Saving (8)</p>
-            <a id="#" class="text-primary border border-danger">
-                <u>More Details</u>
-            </a>
+        <!-- Section - Header -->
+        <div class="row sectionHeaderDiv d-flex px-0 border border-primary">
+            <div class="col-12 col-sm-9">
+                <p class="fw-bold sectionHeader m-0 ms-2 border border-primary">My Current / Saving (8)</p>
+            </div>
+            <div class="col-12 col-sm-3 d-flex align-items-end justify-content-end px-0">
+                <a id="#" class="text-primary">
+                    <u class="">More Details</u>
+                </a>
+            </div>
         </div>
 
-        <div class="row cardDiv border border-primary ps-4 bg-primary-subtle overflow-x-auto flex-nowrap align-items-center">
+        <!-- Section - Cards -->
+        <div class="row cardDiv ps-2 gx-3 border border-primary">
 
-            <div class="col-3 me-2">
+            <!-- Card 1 -->
+            <div class="col">
                 <a id="#">
-                    <div class="row border p-2 rounded-4 cards gx-0 me-1">
-                        <!-- Icon -->
-                        <div class="col-3 iconContainer">
-                            <div class="iconBackground">
-                                <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                    <div class="cards py-2 px-3 rounded-4">
+                        <div class="row gx-0 w-100">
+
+                            <!-- Icon -->
+                            <div class="col-3 iconContainer">
+                                <div class="iconBackground">
+                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                </div>
+                            </div>
+
+                            <!-- Cards Content -->
+                            <div class="col-9 cardsContent ps-2">
+                                <label class="fw-bold">Primary Account</label>
+                                <label>Plus Savings Account</label>
                             </div>
                         </div>
 
-                        <!-- Tittle and description -->
-                        <div class="col border d-flex flex-column justify-content-center">
-                            <label class="fw-bold">Primary Account</label>
-                            <label>Plus Savings Account</label>
+                        <!-- Cards Content Bottom - Account / Card Number -->
+                        <div class="cardsContentBottom">
+                            <label class="fw-bold m-0">Account Number</label>
+                            <label class="m-0">6800934822</label>
                         </div>
                     </div>
                 </a>
             </div>
 
-            <div class="col-3 me-2">
+            <!-- Card 2 -->
+            <div class="col">
                 <a id="#">
-                    <div class="row border p-2 rounded-4 cards gx-0 me-1">
-                        <!-- Icon -->
-                        <div class="col-3 iconContainer">
-                            <div class="iconBackground">
-                                <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                    <div class="cards py-2 px-3 rounded-4">
+                        <div class="row gx-0 w-100">
+
+                            <!-- Icon -->
+                            <div class="col-3 iconContainer">
+                                <div class="iconBackground">
+                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                </div>
+                            </div>
+
+                            <!-- Cards Content -->
+                            <div class="col-9 cardsContent ps-2">
+                                <label class="fw-bold">Primary Account</label>
+                                <label>Plus Savings Account</label>
                             </div>
                         </div>
 
-                        <!-- Tittle and description -->
-                        <div class="col border d-flex flex-column justify-content-center">
-                            <label class="fw-bold">Primary Account</label>
-                            <label>Plus Savings Account</label>
+                        <!-- Cards Content Bottom - Account / Card Number -->
+                        <div class="cardsContentBottom">
+                            <label class="fw-bold m-0">Account Number</label>
+                            <label class="m-0">6800934822</label>
                         </div>
                     </div>
                 </a>
             </div>
 
-            <div class="col-3">
+            <!-- Card 3 -->
+            <div class="col">
                 <a id="#">
-                    <div class="row border p-2 rounded-4 cards gx-0 me-1">
-                        <!-- Icon -->
-                        <div class="col-3 iconContainer">
-                            <div class="iconBackground">
-                                <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                    <div class="cards py-2 px-3 rounded-4">
+                        <div class="row gx-0 w-100">
+
+                            <!-- Icon -->
+                            <div class="col-3 iconContainer">
+                                <div class="iconBackground">
+                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                </div>
+                            </div>
+
+                            <!-- Cards Content -->
+                            <div class="col-9 cardsContent ps-2">
+                                <label class="fw-bold">Primary Account</label>
+                                <label>Plus Savings Account</label>
                             </div>
                         </div>
 
-                        <!-- Tittle and description -->
-                        <div class="col border d-flex flex-column justify-content-center">
-                            <label class="fw-bold">Primary Account</label>
-                            <label>Plus Savings Account</label>
+                        <!-- Cards Content Bottom - Account / Card Number -->
+                        <div class="cardsContentBottom">
+                            <label class="fw-bold m-0">Account Number</label>
+                            <label class="m-0">6800934822</label>
                         </div>
                     </div>
                 </a>
             </div>
 
-            <div class="col-3">
+            <!-- Card 4 -->
+            <div class="col">
                 <a id="#">
-                    <div class="row border p-2 rounded-4 cards gx-0 me-1">
-                        <!-- Icon -->
-                        <div class="col-3 iconContainer">
-                            <div class="iconBackground">
-                                <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                    <div class="cards py-2 px-3 rounded-4">
+                        <div class="row gx-0 w-100">
+
+                            <!-- Icon -->
+                            <div class="col-3 iconContainer">
+                                <div class="iconBackground">
+                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                </div>
+                            </div>
+
+                            <!-- Cards Content -->
+                            <div class="col-9 cardsContent ps-2">
+                                <label class="fw-bold">Primary Account</label>
+                                <label>Plus Savings Account</label>
                             </div>
                         </div>
 
-                        <!-- Tittle and description -->
-                        <div class="col border d-flex flex-column justify-content-center">
-                            <label class="fw-bold">Primary Account</label>
-                            <label>Plus Savings Account</label>
+                        <!-- Cards Content Bottom - Account / Card Number -->
+                        <div class="cardsContentBottom">
+                            <label class="fw-bold m-0">Account Number</label>
+                            <label class="m-0">6800934822</label>
                         </div>
                     </div>
                 </a>
             </div>
 
-            <div class="col-3">
+            <!-- Card 5 -->
+            <div class="col">
                 <a id="#">
-                    <div class="row border p-2 rounded-4 cards gx-0 me-1">
-                        <!-- Icon -->
-                        <div class="col-3 iconContainer">
-                            <div class="iconBackground">
-                                <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                    <div class="cards py-2 px-3 rounded-4">
+                        <div class="row gx-0 w-100">
+
+                            <!-- Icon -->
+                            <div class="col-3 iconContainer">
+                                <div class="iconBackground">
+                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                </div>
+                            </div>
+
+                            <!-- Cards Content -->
+                            <div class="col-9 cardsContent ps-2">
+                                <label class="fw-bold">Primary Account</label>
+                                <label>Plus Savings Account</label>
                             </div>
                         </div>
 
-                        <!-- Tittle and description -->
-                        <div class="col border d-flex flex-column justify-content-center">
-                            <label class="fw-bold">Primary Account</label>
-                            <label>Plus Savings Account</label>
+                        <!-- Cards Content Bottom - Account / Card Number -->
+                        <div class="cardsContentBottom">
+                            <label class="fw-bold m-0">Account Number</label>
+                            <label class="m-0">6800934822</label>
                         </div>
                     </div>
                 </a>
@@ -226,22 +317,22 @@
 
     </div>
 
-    <!-- My Cards -->
+    <!-- Section 2: My Cards -->
     <div class="">
 
     </div>
 
-    <!-- My Fixed Deposits -->
+    <!-- Section 3: My Fixed Deposits -->
     <div class="">
 
     </div>
 
-    <!-- My Loan Financing -->
+    <!-- Section 4: My Loan Financing -->
     <div class="">
 
     </div>
 
-    <!-- My Investments -->
+    <!-- Section 5: My Investments -->
     <div class="">
 
     </div>
