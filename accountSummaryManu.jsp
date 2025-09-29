@@ -45,15 +45,16 @@
     /* font-size: 20px; */
 }
 
-.sectionDic {
-    border: 1px solid blue;
-}
-
 /* Section */
+
+.sectionDiv {
+    border: 2px dotted pink;
+    margin-bottom: 16px;
+}
 
 .sectionHeader {
     font-size: 24px;
-    margin:
+    margin-right: 3px;
 }
 
 /* Section - Cards */
@@ -64,6 +65,7 @@
     display: flex;
     flex-wrap: nowrap;
     align-items: center
+    justify-content: start;
 }
 
 .cardDiv::-webkit-scrollbar {
@@ -147,29 +149,23 @@
     </div>
 
     <!-- Page title -->
-    <h1 class="text-black mb-4 border border-primary-subtle">My Accounts</h1>
+    <h1 class="text-black mb-5">My Accounts</h1>
 
 
     <!-- Section 1: My Current / Savings -->
-    <div class="row sectionDiv border border-danger">
+    <div class="row sectionDiv">
 
         <!-- Section - Header -->
-        <div class="row sectionHeaderDiv d-flex px-0 border border-primary">
-            <div class="col-12 col-sm-9">
-                <p class="fw-bold sectionHeader m-0 ms-2 border border-primary">My Current / Saving (8)</p>
-            </div>
-            <div class="col-12 col-sm-3 d-flex align-items-end justify-content-end px-0">
-                <a id="#" class="text-primary">
-                    <u class="">More Details</u>
-                </a>
-            </div>
+        <div class="d-flex align-items-end mb-4">
+            <p class="sectionHeader fw-bold">My Current / Savings</p>
+            <p class="pb-1">(8)</p>
         </div>
 
         <!-- Section - Cards -->
-        <div class="row cardDiv ps-2 gx-3 border border-primary">
+        <div class="row cardDiv ps-2 gx-3"> 
 
             <!-- Card 1 -->
-            <div class="col">
+            <div class="">
                 <a id="#">
                     <div class="cards py-2 px-3 rounded-4">
                         <div class="row gx-0 w-100">
@@ -177,7 +173,7 @@
                             <!-- Icon -->
                             <div class="col-3 iconContainer">
                                 <div class="iconBackground">
-                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                    <img class="icon" src="resources/images/newIcon/accSummary/dollar.png" alt="Convert Statement">
                                 </div>
                             </div>
 
@@ -198,7 +194,7 @@
             </div>
 
             <!-- Card 2 -->
-            <div class="col">
+            <div class="">
                 <a id="#">
                     <div class="cards py-2 px-3 rounded-4">
                         <div class="row gx-0 w-100">
@@ -206,7 +202,7 @@
                             <!-- Icon -->
                             <div class="col-3 iconContainer">
                                 <div class="iconBackground">
-                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                    <img class="icon" src="resources/images/newIcon/accSummary/dollar.png" alt="Convert Statement">
                                 </div>
                             </div>
 
@@ -227,7 +223,7 @@
             </div>
 
             <!-- Card 3 -->
-            <div class="col">
+            <div class="">
                 <a id="#">
                     <div class="cards py-2 px-3 rounded-4">
                         <div class="row gx-0 w-100">
@@ -235,7 +231,7 @@
                             <!-- Icon -->
                             <div class="col-3 iconContainer">
                                 <div class="iconBackground">
-                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                    <img class="icon" src="resources/images/newIcon/accSummary/dollar.png" alt="Convert Statement">
                                 </div>
                             </div>
 
@@ -256,7 +252,7 @@
             </div>
 
             <!-- Card 4 -->
-            <div class="col">
+            <div class="">
                 <a id="#">
                     <div class="cards py-2 px-3 rounded-4">
                         <div class="row gx-0 w-100">
@@ -264,7 +260,7 @@
                             <!-- Icon -->
                             <div class="col-3 iconContainer">
                                 <div class="iconBackground">
-                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                    <img class="icon" src="resources/images/newIcon/accSummary/dollar.png" alt="Convert Statement">
                                 </div>
                             </div>
 
@@ -285,7 +281,7 @@
             </div>
 
             <!-- Card 5 -->
-            <div class="col">
+            <div class="">
                 <a id="#">
                     <div class="cards py-2 px-3 rounded-4">
                         <div class="row gx-0 w-100">
@@ -293,7 +289,7 @@
                             <!-- Icon -->
                             <div class="col-3 iconContainer">
                                 <div class="iconBackground">
-                                    <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
+                                    <img class="icon" src="resources/images/newIcon/accSummary/dollar.png" alt="Convert Statement">
                                 </div>
                             </div>
 
@@ -318,7 +314,76 @@
     </div>
 
     <!-- Section 2: My Cards -->
-    <div class="">
+    <div class="row sectionDiv">
+
+        <!-- Section - Header -->
+        <div class="d-flex align-items-end mb-4">
+            <p class="sectionHeader fw-bold">My Cards</p>
+            <p class="pb-1">(8)</p>
+        </div>
+
+        <!-- Section - Cards -->
+        <div class="row cardDiv ps-2 gx-3">
+
+            <!-- Card 1 -->
+            <div class="col">
+                <a id="#">
+                    <div class="cards py-2 px-3 rounded-4">
+                        <div class="row gx-0 w-100">
+
+                            <!-- Icon -->
+                            <div class="col-3 iconContainer">
+                                <div class="iconBackground">
+                                    <img class="icon" src="resources/images/newIcon/accSummary/card2.png" alt="Convert Statement">
+                                </div>
+                            </div>
+
+                            <!-- Cards Content -->
+                            <div class="col-9 cardsContent ps-2">
+                                <label class="fw-bold">Main Card</label>
+                                <label>Visa Platinum</label>
+                            </div>
+                        </div>
+
+                        <!-- Cards Content Bottom - Account / Card Number -->
+                        <div class="cardsContentBottom">
+                            <label class="fw-bold m-0">Card Number</label>
+                            <label class="m-0">8800 8474 7766 0000</label>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col">
+                <a id="#">
+                    <div class="cards py-2 px-3 rounded-4">
+                        <div class="row gx-0 w-100">
+
+                            <!-- Icon -->
+                            <div class="col-3 iconContainer">
+                                <div class="iconBackground">
+                                    <img class="icon" src="resources/images/newIcon/accSummary/card2.png" alt="Convert Statement">
+                                </div>
+                            </div>
+
+                            <!-- Cards Content -->
+                            <div class="col-9 cardsContent ps-2">
+                                <label class="fw-bold">Main Card</label>
+                                <label>Visa Platinum</label>
+                            </div>
+                        </div>
+
+                        <!-- Cards Content Bottom - Account / Card Number -->
+                        <div class="cardsContentBottom">
+                            <label class="fw-bold m-0">Card Number</label>
+                            <label class="m-0">8800 8474 7766 0000</label>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
 
     </div>
 
