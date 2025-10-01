@@ -1,0 +1,77 @@
+// to add new page
+
+// transferPayment2.jsp
+<div class="col-6 col-xxl-3"> 
+    <a href="#" id="otherCard"> // = id link to core.js file
+        <div class="transfer-payment-card d-flex flex-column justify-content-between p-4">
+
+            <!-- Top Section -->
+            <div class="d-flex flex-column justify-content-start">
+                <div class="d-flex justify-content-start align-items-center mb-2">
+                    <div class="iconDiv rounded-circle d-flex justify-content-center align-items-center px-2 me-3">
+                        <img class="iconImage" src="resources/images/newIcon/statement/viewEStatement.png" alt="E-Statement" />
+                    </div>
+                    <div class="d-flex flex-column align-items-start">
+                        <span class="fw-semibold transfer-title">Card Payment</span>
+                        <span class="small">Make Card Payment</span>
+                    </div>
+                </div>
+                <div class="d-flex flex-column align-items-start">
+                    <span class="fw-semibold">Card No</span>
+                    <span class="small">5997 0211 0482 0978</span>
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="d-flex justify-content-end">
+                <span class="trxStatus small fw-medium text-nowrap">Paid<i class="bi bi-check-circle ms-2"></i></span>
+            </div>
+        </div>
+    </a>
+</div>
+
+// transferPaymentCore2.js
+var initTransferPayment = function() {
+    initEventListeners();
+}
+
+function initEventListeners() {
+    $("#otherCard").off("click").click(function() {
+            AjaxOtherCard();
+        });
+
+function AjaxOtherCard() {
+    console.log("Routing to #sendMoney");
+    showLoader();
+    $.ajax({
+        url: "sendMoney", // = url link to controller
+        type: "POST",
+        cache: false,
+        data: "{}",
+        contentType: "application/json; charset=utf-8",
+        success: function (result) {
+            checkHtmlContent(result);
+            hideLoader();
+        },
+        error: function (result) {
+            console.log("Error when routing to #otherCard");
+            hideLoader();
+            displayErrorPopup(generalErrorMessage);
+        }
+    });
+}
+
+// mainMenuController.java
+	@PostMapping(value = {"/cardPayment-otherCard"}) // = url link to index.js file
+	public String otherCard(Locale locale, Model model, HttpServletRequest request, HttpServletResponse response,
+							@RequestAttribute(Req.CUSTOMER_INFO) CustomerInfo custInfo,
+							@RequestAttribute(Req.PBE_REQ) Map<String, Object> reqBody) {
+
+		logger.info("Entering Other Card.....");
+
+		super.setJavascriptDateTimeToModel(model);
+		model.addAttribute(ModelAttributes.LANGUAGES, multiLingualController.getJSONData(request, response, PBeFunctions.APPLY));
+		model.addAttribute(ModelAttributes.DISPLAY_NAME, custInfo.getName());
+
+		return "mainMenu/cardPaymentOtherCardForm";
+	}
