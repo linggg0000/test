@@ -1,31 +1,25 @@
-<!-- Section - Cards -->
-<div class="row cardDiv ps-2 gx-3  border border-primary">
+<!-- Select Bank -->
+<div class="row mb-4 border border-primary">
+    <label class="col-sm-12 form-label" name="recipientBankLabel">Recipient Bank</label>
 
-    <!-- Card 1 -->
-    <div class="col d-flex">
-        <a id="#">
-            <div class="cards py-2 px-3 rounded-4 gx-0 border border-danger">
-                <div class="row gx-0 border border-success">
+    <div class="dropdown mb-2 border border-success px-0">
+        <button type="button" class="recipientBankButton col-12 form-select btn bg-white border border-1 dropdown-toggle text-start" id="dropdownMenuButton1" name="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+            Please select <span style="font-size: 12px;"><i class="fad fa-solid fa-chevron-down float-end" style="margin-top: 6px; margin-right: 3px;"></i></span>
+        </button>
 
-                    <!-- Icon -->
-                    <div class="col-3 iconContainer">
-                        <div class="iconBackground">
-                            <img class="icon" src="resources/images/newIcon/statement/convertStatement.png" alt="Convert Statement">
-                        </div>
+        <input type="text" class="form-control hidden" id="hiddenSelectedBankID" name="hiddenSelectedBankID" value="">
+        <input type="text" class="form-control hidden" id="hiddenSelectedBankName" name="hiddenSelectedBankName" value="">
+        <ul class="dropdown-menu px-3" id="bankListUL" style="width:100%; z-index:0" aria-labelledby="dropdownMenuButton1">
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-floating">
+                        <input type="text" class="form-control search" id="bankSearchBar" placeholder="name@example.com">
+                        <label for="bankSearchBar" class="searchLabel" name="searchLabel">Search</label>
                     </div>
-
-                    <!-- Information -->
-                    <div class="col cardsContent border border-primary">
-                        <label class="fw-bold">Primary Account</label>
-                        <label>Plus Savings Account</label>
-                    </div>
-                </div>
-
-                <!-- Account / Card Number -->
-                <div class="row d-flex flex-column align-items-start border border-danger gx-0">
-                    <p class="fw-bold m-0">Account Number</p>
-                    <p class="m-0">6800934822</p>
                 </div>
             </div>
-        </a>
+
+            <div class="row scrollable mt-3" id="beneBankDiv" style="max-height:400px;overflow:auto;"></div>
+        </ul>
     </div>
+</div>
