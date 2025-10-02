@@ -1,25 +1,154 @@
-<!-- Select Bank -->
-<div class="row mb-4 border border-primary">
-    <label class="col-sm-12 form-label" name="recipientBankLabel">Recipient Bank</label>
+var initSendMoneyOwnAcc = function() {
+    initSendMoneyOwnAccPage();
+    initEventListeners();
+}
 
-    <div class="dropdown mb-2 border border-success px-0">
-        <button type="button" class="recipientBankButton col-12 form-select btn bg-white border border-1 dropdown-toggle text-start" id="dropdownMenuButton1" name="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-            Please select <span style="font-size: 12px;"><i class="fad fa-solid fa-chevron-down float-end" style="margin-top: 6px; margin-right: 3px;"></i></span>
-        </button>
+function initSendMoneyOwnAccPage() {
+    // Tabs
+    $(".tab1").removeClass("inactive").addClass("active");
+    $(".tab2").removeClass("active").addClass("inactive");
+    $(".tab3").removeClass("active").addClass("inactive");
 
-        <input type="text" class="form-control hidden" id="hiddenSelectedBankID" name="hiddenSelectedBankID" value="">
-        <input type="text" class="form-control hidden" id="hiddenSelectedBankName" name="hiddenSelectedBankName" value="">
-        <ul class="dropdown-menu px-3" id="bankListUL" style="width:100%; z-index:0" aria-labelledby="dropdownMenuButton1">
-            <div class="row">
-                <div class="col-12">
-                    <div class="form-floating">
-                        <input type="text" class="form-control search" id="bankSearchBar" placeholder="name@example.com">
-                        <label for="bankSearchBar" class="searchLabel" name="searchLabel">Search</label>
-                    </div>
-                </div>
-            </div>
+    // Content Region
+    $("#sendMoneyOwnAccountForm").removeClass("hidden");
+    $("#sendMoneyOwnAccountConfirm").addClass("hidden");
+    $("#sendMoneyOwnAccountComplete").addClass("hidden");
 
-            <div class="row scrollable mt-3" id="beneBankDiv" style="max-height:400px;overflow:auto;"></div>
-        </ul>
-    </div>
-</div>
+    // Action Buttons
+    $(".ownAccForm-buttons").removeClass("hidden");
+    $(".ownAccConfirm-buttons").addClass("hidden");
+    $(".ownAccCompletion-buttons").addClass("hidden");
+}
+
+function initEventListeners() {
+
+    $("#goBack").off("click").click(function() {
+        AjaxSendMoney();
+    });
+
+    // Pagination tabs navigation
+    $(".tab1").on("click", function() {
+        $(".tab2").removeClass("active").addClass("inactive");
+        $(".tab3").removeClass("active").addClass("inactive");
+        $(".tab1").removeClass("inactive").addClass("active");
+
+        $("#sendMoneyOwnAccountConfirm").addClass("hidden");
+        $("#sendMoneyOwnAccountComplete").addClass("hidden");
+        $("#sendMoneyOwnAccountForm").removeClass("hidden");
+
+        $(".ownAccConfirm-buttons").addClass("hidden");
+        $(".ownAccCompletion-buttons").addClass("hidden");
+        $(".ownAccForm-buttons").removeClass("hidden");
+
+        $(".profilePic")[0].focus();
+    });
+
+    $(".tab2").on("click", function() {
+        $(".tab1").removeClass("active").addClass("inactive");
+        $(".tab3").removeClass("active").addClass("inactive");
+        $(".tab2").removeClass("inactive").addClass("active");
+
+        $("#sendMoneyOwnAccountForm").addClass("hidden");
+        $("#sendMoneyOwnAccountComplete").addClass("hidden");
+        $("#sendMoneyOwnAccountConfirm").removeClass("hidden");
+
+        $(".ownAccForm-buttons").addClass("hidden");
+        $(".ownAccCompletion-buttons").addClass("hidden");
+        $(".ownAccConfirm-buttons").removeClass("hidden");
+
+        $(".profilePic")[0].focus();
+    });
+
+    $(".tab3").on("click", function() {
+        $(".tab1").removeClass("active").addClass("inactive");
+        $(".tab2").removeClass("active").addClass("inactive");
+        $(".tab3").removeClass("inactive").addClass("active");
+
+        $("#sendMoneyOwnAccountForm").addClass("hidden");
+        $("#sendMoneyOwnAccountConfirm").addClass("hidden");
+        $("#sendMoneyOwnAccountComplete").removeClass("hidden");
+
+        $(".ownAccForm-buttons").addClass("hidden");
+        $(".ownAccConfirm-buttons").addClass("hidden");
+        $(".ownAccCompletion-buttons").removeClass("hidden");
+
+        $(".profilePic")[0].focus();
+    });
+
+    // Form page buttons navigation
+
+    $("#ownAccForm-Next").on("click", function() {
+        $(".tab1").removeClass("active").addClass("inactive");
+        $(".tab3").removeClass("active").addClass("inactive");
+        $(".tab2").removeClass("inactive").addClass("active");
+
+        $("#sendMoneyOwnAccountForm").addClass("hidden");
+        $("#sendMoneyOwnAccountComplete").addClass("hidden");
+        $("#sendMoneyOwnAccountConfirm").removeClass("hidden");
+
+        $(".ownAccForm-buttons").addClass("hidden");
+        $(".ownAccCompletion-buttons").addClass("hidden");
+        $(".ownAccConfirm-buttons").removeClass("hidden");
+
+        $(".profilePic")[0].focus();
+    });
+
+    // Confirmation page buttons navigation
+
+    $("#ownAccConfirm-Back").on("click", function() {
+        $(".tab2").removeClass("active").addClass("inactive");
+        $(".tab3").removeClass("active").addClass("inactive");
+        $(".tab1").removeClass("inactive").addClass("active");
+
+        $("#sendMoneyOwnAccountConfirm").addClass("hidden");
+        $("#sendMoneyOwnAccountComplete").addClass("hidden");
+        $("#sendMoneyOwnAccountForm").removeClass("hidden");
+
+        $(".ownAccConfirm-buttons").addClass("hidden");
+        $(".ownAccCompletion-buttons").addClass("hidden");
+        $(".ownAccForm-buttons").removeClass("hidden");
+
+        $(".profilePic")[0].focus();
+    });
+
+    $("#ownAccConfirm-Next").on("click", function() {
+        $(".tab1").removeClass("active").addClass("inactive");
+        $(".tab2").removeClass("active").addClass("inactive");
+        $(".tab3").removeClass("inactive").addClass("active");
+
+        $("#sendMoneyOwnAccountForm").addClass("hidden");
+        $("#sendMoneyOwnAccountConfirm").addClass("hidden");
+        $("#sendMoneyOwnAccountComplete").removeClass("hidden");
+
+        $(".ownAccForm-buttons").addClass("hidden");
+        $(".ownAccConfirm-buttons").addClass("hidden");
+        $(".ownAccCompletion-buttons").removeClass("hidden");
+
+        $(".profilePic")[0].focus();
+    });
+
+    // Completion page buttons navigation
+
+
+}
+
+function AjaxSendMoney() {
+    console.log("Routing to #sendMoney");
+    showLoader();
+    $.ajax({
+        url: "sendMoney",
+        type: "POST",
+        cache: false,
+        data: "{}",
+        contentType: "application/json; charset=utf-8",
+        success: function (result) {
+            checkHtmlContent(result);
+            hideLoader();
+        },
+        error: function (result) {
+            console.log("Error when routing to #sendMoney");
+            hideLoader();
+            displayErrorPopup(generalErrorMessage);
+        }
+    });
+}
